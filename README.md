@@ -9,6 +9,34 @@ bugs.
 I'm in the process of moving and won't have much time for this project.  Just
 wanted to get it out there.
 
+Screenshot
+----------
+
+![Screenshot](http://i.imgur.com/HyLbb9Y.gif)
+
+Getting Started
+---------------
+
+Start MongoDB and seed it (creates a calendar db):
+
+```shell
+$ npm run seed
+```
+
+Clone, then npm install and start.
+
+```shell
+$ npm install
+$ npm start
+```
+
+For better dev performance
+```shell
+$ npm run dev:no-debug
+```
+
+Navigate to http://localhost:3000/
+
 Backend
 -----------------
 
@@ -60,29 +88,6 @@ Cancel http requests
 - If you click 'next month' really fast, it should only process the (events)
   data fetch for the last request to fulfill. 
 
-Getting Started
----------------
-
-Start MongoDB and seed it (creates a calendar db):
-
-```shell
-$ npm run seed
-```
-
-Clone, then npm install and start.
-
-```shell
-$ npm install
-$ npm start
-```
-
-For better dev performance
-```shell
-$ npm run dev:no-debug
-```
-
-Navigate to http://localhost:3000/
-
 Future
 ------
 
@@ -91,8 +96,3 @@ UI](https://github.com/elementalui/elemental) instad of bootstrap.
 
 - https://github.com/elementalui/elemental/issues/53
 - https://github.com/nikgraf/future-react-ui/issues/1
-
-Screenshot
-----------
-
-![Screenshot](http://i.imgur.com/HyLbb9Y.gif)
