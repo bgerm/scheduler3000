@@ -1,0 +1,64 @@
+@import 'base';
+
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
+
+*, *:before, *:after {
+  box-sizing: border-box;
+  position: relative;
+}
+
+html, body, :global(#root) {
+  height: 100%;
+  font-size: 14px;
+}
+
+body {
+  background: #F4F1E9;
+  font-family: Lato, sans-serif;
+  font-weight: 300;
+}
+
+a {
+  cursor: pointer;
+}
+
+:global(.viewport) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: absolute !important;
+  width: 100%;
+}
+
+:global(.hflex), :global(.vflex) {
+  display: flex;
+  flex-grow: 1;
+}
+
+:global(.vflex) {
+  flex-direction: column;
+}
+
+:global(.hflex) {
+  flex-direction: row;
+}
+
+:global(.clearfix) {
+  &:before, &:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+:global(.modal-container) {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}

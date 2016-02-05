@@ -1,0 +1,11 @@
+.aside {
+  flex: 0 0 15rem;
+  padding: 0 15px 15px 15px;
+}
+
+.aside h3 {
+  border-bottom: 1px solid #ccc;
+  margin: 0 0 0.8em 0;
+  padding-bottom: 0.4em;
+  font-size: 1.2em;
+}

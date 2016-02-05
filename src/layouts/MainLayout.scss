@@ -1,0 +1,24 @@
+.footer {
+  margin: 20px 15px 10px 15px;
+
+  a {
+    font-size: 0.9em;
+    color: #666;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: inline;
+      margin-right: 10px;
+    }
+  }
+}
+
+.main {
+  flex: 1;
+}
+

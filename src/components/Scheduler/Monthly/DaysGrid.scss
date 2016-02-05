@@ -1,0 +1,89 @@
+@import 'month-grid';
+
+.grid {
+  background-color: #eee;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  cursor: default;
+  user-select: none;
+
+  .cell {
+    @include cellWidth(1, $columns, $gutter);
+    @include cellHeight(1, $rows, $gutter);
+    background: #fff;
+    line-height: inherit;
+    padding: 2px 2px 0 0;
+    color: #666;
+    font-size: 12px;
+  }
+
+  .cell:nth-child(n) {
+    float: left;
+    margin-right: $gutter;
+    margin-bottom: $gutter;
+    clear: none;
+  }
+
+  .cell:last-child {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  /* Note CSS Variables aren't allowed in selectors */
+  .cell:nth-child(7n) {
+    margin-right: 0;
+  }
+
+  .cell:nth-child(7n + 1) {
+    clear: left;
+  }
+
+  .cell:nth-last-child(-n + 7) {
+    margin-bottom: 0;
+  }
+
+  .cell.today {
+    background: #e9f4f1;
+  }
+
+  .cell.selected-create {
+    background: #ece6d8;
+  }
+
+  .cell.selected-edit {
+    background: #E3E1DC;
+  }
+}
+
+.dragger, .dragger-sizer {
+  padding: 0 6px;
+  background: #3879D9;
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  height: 1.5em;
+  line-height: 1.5em;
+  font-size: 12px;
+  color: white;
+  @include cellWidth(1, $columns, 6px);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dragger-sizer {
+  visibility: hidden;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wide {
+  @include cellWidth(1.5, $columns, 6px);
+}
+
+.hidden {
+  display: none;
+}

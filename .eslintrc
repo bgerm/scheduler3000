@@ -1,0 +1,28 @@
+{
+  "parser"  : "babel-eslint",
+  "extends": "airbnb",
+  "extends" : [
+    "standard",
+    "standard-react"
+  ],
+  "env"     : {
+    "browser" : true
+  },
+  "globals" : {
+    "__DEV__"      : false,
+    "__PROD__"     : false,
+    "__DEBUG__"    : false,
+    "__DEBUG_NEW_WINDOW__" : false,
+    "React": true,
+    "ReactDOM": true
+  },
+  "rules": {
+    "semi" : [2, "always"],
+    "react-in-jsx-scope": 0,
+    "no-else-return": 0,
+    "new-cap": 0,
+    "no-nested-ternary": 0,
+    "space-before-function-paren": [0, "always"],
+    "generator-star-spacing": [2, {"before": false, "after": true}]
+  }
+}

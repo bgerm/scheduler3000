@@ -1,0 +1,18 @@
+@import 'month-grid'; 
+
+.weekdays {
+  border-bottom: 1px solid #eee;
+  background: white;
+  position: relative;
+  height: 2em;
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 400;
+  cursor: default;
+  user-select: none;
+}
+
+.weekdays > div {
+  text-align: right;  
+  padding: 2px 2px 0 0;
+}

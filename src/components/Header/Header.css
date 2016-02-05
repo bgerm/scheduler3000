@@ -1,0 +1,12 @@
+.header {
+  color: black;
+  height: 60px;
+  line-height: 60px;
+}
+
+.header h1 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-left: 15px;
+  margin-top: 10px;
+}
