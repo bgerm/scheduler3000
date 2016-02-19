@@ -12,16 +12,16 @@ const propTypes = {
   dragId: PropTypes.string,
   events: PropTypes.object.isRequired,
   positioned: PropTypes.object,
-  editStream: PropTypes.func.isRequired,
+  editMouseDown: PropTypes.func.isRequired,
   showMoreEvents: PropTypes.func.isRequired
 };
 
 class Week extends React.Component {
   edit(event, evnt) {
-    const { editStream } = this.props;
+    const { editMouseDown } = this.props;
     const pageOffset = event.target.getBoundingClientRect();
 
-    editStream(event, evnt.id, evnt.startDate, evnt.endDate, pageOffset);
+    editMouseDown(event, evnt.id, evnt.startDate, evnt.endDate, pageOffset);
   }
 
   render() {

@@ -291,10 +291,11 @@ export function updateEventSuccess(evnt) {
   };
 }
 
-export function updateEventFailure(error) {
+export function updateEventFailure(error, id) {
   return {
     type: UPDATE_EVENT_FAILURE,
-    error: error
+    error: error,
+    id: id
   };
 }
 
@@ -305,10 +306,11 @@ export function deleteEventSuccess(id) {
   };
 }
 
-export function deleteEventFailure(error) {
+export function deleteEventFailure(error, id) {
   return {
     type: DELETE_EVENT_FAILURE,
-    error: error
+    error: error,
+    id: id
   };
 }
 

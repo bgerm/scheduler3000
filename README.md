@@ -30,7 +30,8 @@ $ npm install
 $ npm start
 ```
 
-For better dev performance
+Without DevTools in dev
+
 ```shell
 $ npm run dev:no-debug
 ```

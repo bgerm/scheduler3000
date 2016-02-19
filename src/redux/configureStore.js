@@ -1,12 +1,25 @@
 import thunk from 'redux-thunk';
 import rootReducer from './rootReducer';
 import schedulerSaga from 'sagas/scheduler';
-import sagaMiddleware from 'redux-saga';
+import { Subject } from 'rx';
 import {
   applyMiddleware,
   compose,
   createStore
 } from 'redux';
+
+const sagaMiddleware = saga => {
+  const subject = new Subject();
+
+  return store => {
+    saga(subject).subscribe(dispatchable => store.dispatch(dispatchable));
+
+    return next => action => {
+      next(action);
+      subject.onNext({action: action, store: store.getState()});
+    };
+  };
+};
 
 export default function configureStore (initialState) {
   let createStoreWithMiddleware;

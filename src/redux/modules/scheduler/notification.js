@@ -3,10 +3,12 @@
 // ------------------------------------
 const SET_NOTIFICATION = 'scheduler/notification/SET_NOTIFICATION';
 const CLEAR_NOTIFICATION = 'scheduler/notification/CLEAR_NOTIFICATION';
+const CANCEL_NOTIFICATION = 'scheduler/notification/CANCEL_NOTIFICATION';
 
 export const actionTypes = {
   SET_NOTIFICATION,
-  CLEAR_NOTIFICATION
+  CLEAR_NOTIFICATION,
+  CANCEL_NOTIFICATION
 };
 
 // ------------------------------------
@@ -41,5 +43,11 @@ export function setNotification(message) {
 export function clearNotification() {
   return {
     type: CLEAR_NOTIFICATION
+  };
+}
+
+export function cancelNotification() {
+  return {
+    type: CANCEL_NOTIFICATION
   };
 }

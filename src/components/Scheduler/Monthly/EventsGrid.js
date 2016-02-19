@@ -10,7 +10,7 @@ const propTypes = {
   events: PropTypes.object,
   positioned: PropTypes.object,
   dragId: PropTypes.string,
-  editStream: PropTypes.func.isRequired,
+  editMouseDown: PropTypes.func.isRequired,
   updateShowLimit: PropTypes.func.isRequired
 };
 
@@ -24,8 +24,6 @@ class EventsGrid extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     const { period, dragId, positioned } = this.props;
 
-    // TODO make period immutable and just check if
-    // period is the same
     return !(nextProps.period === period &&
       nextProps.dragId === dragId &&
       nextProps.positioned === positioned && this.state.targetId === nextState.targetId);
@@ -86,7 +84,7 @@ class EventsGrid extends React.Component {
   }
 
   render() {
-    const { period, editStream, dragId, events, positioned } = this.props;
+    const { period, editMouseDown, dragId, events, positioned } = this.props;
 
     const startDate = period.get('startDate');
     const endDate = period.get('endDate');
@@ -99,7 +97,7 @@ class EventsGrid extends React.Component {
 
       return (<Week
         startDate={x}
-        editStream={editStream}
+        editMouseDown={editMouseDown}
         today={today}
         dragId={dragId}
         events={events}
