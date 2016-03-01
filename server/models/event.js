@@ -15,8 +15,7 @@ var eventSchema = new Schema({
 const sameDay = (utc, timezone) => {
   const { years, months, date } = moment.utc(utc).toObject();
   return moment.tz([years, months, date], timezone);
-  
-}
+};
 
 eventSchema.plugin(timestamps);
 eventSchema.options.toJSON = {
@@ -27,7 +26,7 @@ eventSchema.options.toJSON = {
     }
     ret.startDate = ret.startDate.valueOf();
     ret.endDate = ret.endDate.valueOf();
-    
+
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;

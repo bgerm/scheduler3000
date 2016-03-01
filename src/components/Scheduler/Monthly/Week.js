@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import styles from './Week.scss';
 import CSSModules from 'react-css-modules';
@@ -41,7 +42,7 @@ class Week extends React.Component {
     });
 
     const renderEvents = (positioned || []).map((e, idx) => {
-      const rows = e.map(b => {
+      const rows = e.map((b) => {
         const id = b.get('id');
         const start = b.get('start');
         const span = b.get('span');
@@ -82,7 +83,7 @@ class Week extends React.Component {
             <div styleName='event-block-wrapper' onMouseDown={(e) => !evnt.saving && this.edit(e, evnt)}>
               <div styleName={eventBlockStyles}>
                 <div styleName={eventStyles}>
-                  { evnt.title || 'No title' }
+                  {evnt.title || 'No title'}
                 </div>
               </div>
             </div>
@@ -92,7 +93,7 @@ class Week extends React.Component {
 
       return (
         <div styleName='event-row' key={`row-${idx}`}>
-          { rows }
+          {rows}
         </div>
       );
     });
@@ -100,9 +101,9 @@ class Week extends React.Component {
     return (
       <div styleName='week'>
         <div styleName='event-row event-days'>
-          { dayLabels }
+          {dayLabels}
         </div>
-        { renderEvents }
+        {renderEvents}
       </div>
     );
   }

@@ -32,8 +32,8 @@ function callApi(endpoint, config, params = null, schema, transformations) {
   const fullUrl = appendParamsToUrl(url, params);
 
   return fetch(fullUrl, config || {})
-    .then(response =>
-      response.json().then(json => ({ json, response }))
+    .then((response) =>
+      response.json().then((json) => ({ json, response }))
     ).then(({ json, response }) => {
       if (!response.ok) {
         return Promise.reject(json);
@@ -46,8 +46,8 @@ function callApi(endpoint, config, params = null, schema, transformations) {
 
       return normalized;
     }).then(
-      response => ({response}),
-      error => ({error: error.message || 'Something bad happened'})
+      (response) => ({response}),
+      (error) => ({error: error.message || 'Something bad happened'})
     );
 }
 

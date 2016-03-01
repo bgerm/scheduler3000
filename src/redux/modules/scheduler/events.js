@@ -116,7 +116,7 @@ export default function events(state = initialState, action) {
     case UPDATE_EVENT:
       newEvent = {
         ...state.events[action.evnt.id],
-        ...omitBy(action.evnt, x => x === undefined),
+        ...omitBy(action.evnt, (x) => x === undefined),
         saving: true
       };
 
@@ -130,7 +130,7 @@ export default function events(state = initialState, action) {
     case UPDATE_EVENT_SUCCESS:
       newEvent = {
         ...state.events[action.evnt.id],
-        ...omitBy(action.evnt, x => x === undefined),
+        ...omitBy(action.evnt, (x) => x === undefined),
         saving: false
       };
 

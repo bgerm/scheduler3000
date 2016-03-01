@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import styles from './HeaderContainer.scss';
 import CSSModules from 'react-css-modules';
@@ -51,7 +52,7 @@ export default class HeaderContainer extends React.Component {
     return (
       <div styleName='component-topbar' className='clearfix'>
         <div styleName={noticeStyles} role='alert'>
-          { notification }
+          {notification}
         </div>
         <div styleName='topbar-left'>
           <div className='btn-group' role='group' aria-label='Change'>
@@ -72,8 +73,10 @@ export default class HeaderContainer extends React.Component {
 
         <div styleName='topbar-right'>
           <div className='btn-group' role='group' aria-label='Change'>
-            <button type='button' className='btn btn-sm btn-secondary' onClick={() => dispatch(pushPath('/scheduler/weekly'))}>Weekly</button>
-            <button type='button' className='btn btn-sm btn-secondary' onClick={() => dispatch(pushPath('/scheduler/monthly'))}>Monthly</button>
+            <button type='button' className='btn btn-sm btn-secondary'
+              onClick={() => dispatch(pushPath('/scheduler/weekly'))}>Weekly</button>
+            <button type='button' className='btn btn-sm btn-secondary'
+              onClick={() => dispatch(pushPath('/scheduler/monthly'))}>Monthly</button>
           </div>
         </div>
       </div>

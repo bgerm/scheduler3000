@@ -1,3 +1,4 @@
+import React from 'react';
 import Header from 'components/Header/Header';
 import AsideContainer from 'containers/Scheduler/AsideContainer';
 import HeaderContainer from 'containers/Scheduler/HeaderContainer';

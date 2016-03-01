@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import SchedulerModal from './SchedulerModal';
 import EventTime from './EventTime';
@@ -52,7 +53,8 @@ export default class NewModal extends React.Component {
     return (
       <SchedulerModal onClose={onClose}>
         <div className='modal-header' style={{padding: '8px 0'}}>
-          <button type='button' className='close' data-dismiss='modal' aria-label='Close' onClick={onClose} tabIndex='-1'>
+          <button type='button' className='close' data-dismiss='modal'
+            aria-label='Close' onClick={onClose} tabIndex='-1'>
             <span aria-hidden='true'>×</span>
           </button>
           <h6 className='modal-title' style={{'width': 'calc(100% - 1.1em)'}}>New Event</h6>
@@ -76,10 +78,10 @@ export default class NewModal extends React.Component {
                 validateOn='blur'
               >
                 <input type='text' className='form-control' autoComplete='off' placeholder='New Event' autoFocus />
-                { getField(newEventForm, 'title').errors.required &&
+                {getField(newEventForm, 'title').errors.required &&
                   <div className='text-help'>Title is required</div>
                 }
-                { getField(newEventForm, 'title').errors.length &&
+                {getField(newEventForm, 'title').errors.length &&
                   <div className='text-help'>Title is too long</div>
                 }
               </Field>
@@ -95,7 +97,9 @@ export default class NewModal extends React.Component {
           </div>
           <div className='form-group row'>
             <div className='col-sm-offset-2 col-sm-10'>
-              <button type='submit' className='btn btn-sm btn-primary' style={{marginRight: '10px'}}>Create Event</button>
+              <button type='submit' className='btn btn-sm btn-primary' style={{marginRight: '10px'}}>
+                Create Event
+              </button>
               <a>Edit Event &raquo;</a>
             </div>
           </div>

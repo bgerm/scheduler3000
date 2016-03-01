@@ -1,4 +1,4 @@
-import { PropTypes } from 'react';
+import React, { PropTypes } from 'react';
 import styles from './DaysGrid.scss';
 import CSSModules from 'react-css-modules';
 import classNames from 'classNames';
@@ -77,7 +77,7 @@ class DaysGrid extends React.Component {
 
     const dates = range(startDate, endDate);
 
-    const days = dates.map(x => {
+    const days = dates.map((x) => {
       const isToday = today.isSame(x, 'day');
 
       const styleNames = classNames(
@@ -90,8 +90,8 @@ class DaysGrid extends React.Component {
         <div
           styleName={styleNames}
           key={x.valueOf()}
-          onMouseMove={e => enterCell(e, x)}
-          onMouseDown={e => e.button === 0 && newMouseDown(e, x)}
+          onMouseMove={(e) => enterCell(e, x)}
+          onMouseDown={(e) => e.button === 0 && newMouseDown(e, x)}
         ></div>
       );
     });
@@ -117,8 +117,8 @@ class DaysGrid extends React.Component {
 
     return (
       <div styleName='grid' ref='gridContainer'>
-        { days }
-        { handle }
+        {days}
+        {handle}
         <div styleName='dragger-sizer' ref='draggerSizerNormal'></div>
         <div styleName='dragger-sizer wide' ref='draggerSizerWide'></div>
       </div>

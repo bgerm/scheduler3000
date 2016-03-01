@@ -1,3 +1,4 @@
+import React, { PropTypes } from 'react';
 import '../styles/core.scss';
 import { GatewayProvider, GatewayDest } from 'react-gateway';
 
@@ -15,7 +16,7 @@ function CoreLayout ({ children }) {
 }
 
 CoreLayout.propTypes = {
-  children: React.PropTypes.element
+  children: PropTypes.element
 };
 
 export default CoreLayout;

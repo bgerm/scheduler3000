@@ -1,3 +1,4 @@
+import React from 'react';
 import { createDevTools } from 'redux-devtools';
 import LogMonitorConsole from 'redux-devtools-log-monitor-console';
 import DockMonitor from 'redux-devtools-dock-monitor';

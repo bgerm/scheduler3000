@@ -130,7 +130,7 @@ export default function startDate(state = initialState, action) {
 // Action Creators
 // ------------------------------------
 const getRoutePeriod = (state) => {
-  const path = state.router.path;
+  const path = state.router.locationBeforeTransitions.pathname;
 
   let period = null;
   if (path.indexOf('/scheduler') >= 0) {

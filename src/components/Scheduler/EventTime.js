@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 
 const DATE_FORMAT = 'ddd, MMM D';

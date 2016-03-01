@@ -1,3 +1,4 @@
+import React from 'react';
 import { Route, IndexRoute, IndexRedirect } from 'react-router';
 
 import CoreLayout from 'layouts/CoreLayout';
@@ -8,7 +9,7 @@ import AboutView from 'views/AboutView';
 import MonthlyContainer from 'containers/Scheduler/MonthlyContainer';
 import WeeklyContainer from 'containers/Scheduler/WeeklyContainer';
 
-export default (
+export default (store) => (
   <Route path='/' component={CoreLayout}>
     <Route component={MainLayout}>
       <IndexRoute component={HomeView} />
@@ -16,7 +17,7 @@ export default (
     </Route>
 
     <Route path='scheduler' component={SchedulerLayout}>
-      <IndexRedirect to='/scheduler/monthly' />
+      <IndexRedirect to='monthly' />
       <Route path='monthly' component={MonthlyContainer} />
       <Route path='weekly' component={WeeklyContainer} />
     </Route>

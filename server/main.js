@@ -1,65 +1,87 @@
-import express from 'express'
-import historyApiFallback from 'connect-history-api-fallback'
-import config from '../config'
-import events from './controllers/api/events';
+import Koa from 'koa';
+import bodyparser from 'koa-bodyparser';
+import convert from 'koa-convert';
 import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
+import webpack from 'webpack';
+import webpackConfig from '../build/webpack.config';
+import historyApiFallback from 'koa-connect-history-api-fallback';
+import serve from 'koa-static';
+import proxy from 'koa-proxy';
+import _debug from 'debug';
+import config from '../config';
+import events from './controllers/api/events';
+import webpackDevMiddleware from './middleware/webpack-dev';
+import webpackHMRMiddleware from './middleware/webpack-hmr';
+import logger from 'koa-logger';
 
 mongoose.Promise = Promise;
 
 const { MONGO_DB, MONGO_URL } = process.env;
-const connStr = `${MONGO_URL}/${MONGO_DB}`
+const connStr = `${MONGO_URL}/${MONGO_DB}`;
 
-mongoose.connect(connStr)
+mongoose.connect(connStr);
 mongoose.connection.on('error', (error) => {
-  console.log('MongoDB Connection Error:', error)
+  console.log('MongoDB Connection Error:', error);
 });
 
-const app = express()
-const debug = require('debug')('app:server')
-const paths = config.utils_paths
+const debug = _debug('app:server');
+const paths = config.utils_paths;
+const app = new Koa();
 
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
-})); 
+if (config.env === 'development') {
+  app.use(convert(logger()));
+}
 
-app.use('/api', events);
+// Enable koa-proxy if it has been enabled in the config.
+if (config.proxy && config.proxy.enabled) {
+  app.use(convert(proxy(config.proxy.options)));
+}
 
-app.use(historyApiFallback({
+// API support
+app.use(convert(bodyparser()));
+
+const eventsRouter = events;
+
+app
+  .use(convert(eventsRouter.routes()))
+  .use(convert(eventsRouter.allowedMethods()));
+
+// This rewrites all routes requests to the root /index.html file
+// (ignoring file requests). If you want to implement isomorphic
+// rendering, you'll want to remove this middleware.
+app.use(convert(historyApiFallback({
   verbose: false
-}))
+})));
 
-// Serve app with Webpack if HMR is enabled
-if (config.compiler_enable_hmr) {
-  const webpack = require('webpack')
-  const webpackConfig = require('../build/webpack.config')
-  const compiler = webpack(webpackConfig)
+// ------------------------------------
+// Apply Webpack HMR Middleware
+// ------------------------------------
+if (config.env === 'development') {
+  const compiler = webpack(webpackConfig);
+
+  // Enable webpack-dev and webpack-hot middleware
+  const { publicPath } = webpackConfig.output;
+
+  app.use(webpackDevMiddleware(compiler, publicPath));
+  app.use(webpackHMRMiddleware(compiler));
 
   // Serve static assets from ~/src/static since Webpack is unaware of
   // these files. This middleware doesn't need to be enabled outside
   // of development since this directory will be copied into ~/dist
   // when the application is compiled.
-  app.use(express.static(paths.client('static')))
-
-  // Enable webpack-dev-server middleware
-  app.use(require('./middleware/webpack-dev')({
-    compiler,
-    publicPath: webpackConfig.output.publicPath
-  }))
-  app.use(require('./middleware/webpack-hmr')({ compiler }))
+  app.use(convert(serve(paths.client('static'))));
 } else {
   debug(
-    'Application is being run outside of development mode. This starter kit ' +
-    'does not provide any production-specific server functionality. To learn ' +
+    'Server is being run outside of live development mode. This starter kit ' +
+    'does not provide any production-ready server functionality. To learn ' +
     'more about deployment strategies, check out the "deployment" section ' +
     'in the README.'
-  )
+  );
 
   // Serving ~/dist by default. Ideally these files should be served by
   // the web server and not the app server, but this helps to demo the
   // server in production.
-  app.use(express.static(paths.base(config.dir_dist)))
+  app.use(convert(serve(paths.base(config.dir_dist))));
 }
 
-export default app
+export default app;

@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from './AsideContainer.css';
 import CSSModules from 'react-css-modules';
 

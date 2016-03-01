@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { routeReducer as router } from 'redux-simple-router';
+import { routerReducer as router } from 'react-router-redux';
 import scheduler from './modules/scheduler';
 
 export default combineReducers({

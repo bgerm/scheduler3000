@@ -1,27 +1,30 @@
 {
   "parser"  : "babel-eslint",
-  "extends": "airbnb",
   "extends" : [
     "standard",
     "standard-react"
+  ],
+  "plugins" : [
+    "flow-vars"
   ],
   "env"     : {
     "browser" : true
   },
   "globals" : {
+    "Action"       : false,
     "__DEV__"      : false,
     "__PROD__"     : false,
     "__DEBUG__"    : false,
     "__DEBUG_NEW_WINDOW__" : false,
-    "React": true,
-    "ReactDOM": true
+    "__BASENAME__" : false
   },
   "rules": {
     "semi" : [2, "always"],
-    "react-in-jsx-scope": 0,
+    "max-len": [2, 120, 2],
     "no-else-return": 0,
     "new-cap": 0,
-    "no-nested-ternary": 0,
+    "flow-vars/define-flow-type": 1,
+    "flow-vars/use-flow-type": 1,
     "space-before-function-paren": [0, "always"],
     "generator-star-spacing": [2, {"before": false, "after": true}]
   }

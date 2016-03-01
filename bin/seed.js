@@ -3,7 +3,6 @@ require('dotenv').load();
 import Event from '../server/models/event';
 import mongoose from 'mongoose';
 import moment from 'moment-timezone';
-import { range, sample } from 'lodash'
 import faker from 'faker';
 
 // TODO: seed via REST API instad?
@@ -11,17 +10,17 @@ import faker from 'faker';
 mongoose.Promise = Promise;
 
 const { MONGO_DB, MONGO_URL } = process.env;
-const connStr = `${MONGO_URL}/${MONGO_DB}`
+const connStr = `${MONGO_URL}/${MONGO_DB}`;
 
 try {
   mongoose.connect(connStr);
 } catch (err) {
-  console.log('error connecting to mongodb', err); 
+  console.log('error connecting to mongodb', err);
 }
 
 function seedNewEvents() {
   const beginning = moment.utc().startOf('month').startOf('week');
-  
+
   const addDays = (date, addDays) => date.clone().add(addDays, 'days');
 
   const data = (startDays, endDays) => {
@@ -30,7 +29,7 @@ function seedNewEvents() {
       startDate: addDays(beginning, startDays - 1),
       endDate: addDays(beginning, endDays - 1).endOf('day'),
       allDay: true
-    } 
+    };
   };
 
   const newEvents = [
@@ -45,12 +44,12 @@ function seedNewEvents() {
     data(8, 10),
     data(11, 16),
     data(16, 18)
-  ]
+  ];
 
-  const saved = newEvents.map(doc => {
+  const saved = newEvents.map((doc) => {
     return Event.create(doc)
-      .then(x => console.log('saved', x.title))
-      .catch(err => console.log('error', err, doc));
+      .then((x) => console.log('saved', x.title))
+      .catch((err) => console.log('error', err, doc));
   });
 
   return Promise.all(saved);
@@ -60,7 +59,7 @@ async function seed() {
   try {
     await seedNewEvents();
   } catch (err) {
-    console.log('error:', err);    
+    console.log('error:', err);
   }
 
   mongoose.disconnect();

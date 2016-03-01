@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import styles from './EventsGrid.scss';
 import CSSModules from 'react-css-modules';
@@ -92,7 +93,7 @@ class EventsGrid extends React.Component {
 
     const weekStarts = range(startDate, endDate, 1, 'week');
 
-    const weeks = weekStarts.map(x => {
+    const weeks = weekStarts.map((x) => {
       const weekPositions = positioned.get(x.format('YYYYMMDD'));
 
       return (<Week
@@ -109,8 +110,8 @@ class EventsGrid extends React.Component {
 
     return (
       <div styleName='weeks' ref='container'>
-        { this.renderPopover() }
-        { weeks }
+        {this.renderPopover()}
+        {weeks}
       </div>
     );
   }

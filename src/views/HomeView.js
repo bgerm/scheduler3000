@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from './HomeView.scss';
 import CSSModules from 'react-css-modules';
 

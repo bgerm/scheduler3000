@@ -4,7 +4,7 @@ import { range, isRangeOverlapping } from 'utils/DateHelpers';
 function findOverlaps(events, keys, startDate, endDate) {
   const overlaps = [];
 
-  keys.forEach(k => {
+  keys.forEach((k) => {
     const evnt = events[k];
     if (isRangeOverlapping(startDate, endDate, evnt.startDate, evnt.endDate)) {
       overlaps.push(k);

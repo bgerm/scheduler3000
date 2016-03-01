@@ -1,6 +1,5 @@
 import { Observable } from 'rx';
 import { changePeriod } from 'redux/modules/scheduler/period';
-import { UPDATE_PATH } from 'redux-simple-router';
 import { DRAG_TYPES } from 'redux/modules/scheduler/drag';
 import { memoize } from 'lodash';
 import { fetchEvents, insertEvent, updateEvent, deleteEvent } from 'services/api';
@@ -9,39 +8,40 @@ import * as NotificationActions from 'redux/modules/scheduler/notification';
 import * as DragActions from 'redux/modules/scheduler/drag';
 import positionMonthsEvents from 'components/Scheduler/Monthly/positionMonthsEvents';
 
-const actionPredicate = actions => filterable => actions.some(action => action === filterable.action.type);
+const actionPredicate = (actions) =>
+  (filterable) => actions.some((action) => (action) === filterable.action.type);
 
 // -------------
 // Change Period
 // -------------
 
-const INIT_PATH = '@@router/INIT_PATH';
+const ROUTER_CHANGE = '@@router/LOCATION_CHANGE';
 
-const changePeriodOnPathChange = iterable => iterable
-  .filter(actionPredicate([UPDATE_PATH, INIT_PATH]))
-  .map(value => value.action)
-  .map(routeChange => routeChange.payload.path)
-  .filter(path => path.indexOf('/scheduler') >= 0)
-  .map(path => changePeriod(path.split('/')[2]));
+const changePeriodOnPathChange = (iterable) => iterable
+  .filter(actionPredicate([ROUTER_CHANGE]))
+  .map((value) => value.action)
+  .map((routeChange) => routeChange.payload.pathname)
+  .filter((path) => path.indexOf('/scheduler') >= 0)
+  .map((path) => changePeriod(path.split('/')[2]));
 
 // ---------------------------
 // Fetch data on period change
 // ---------------------------
 
-const fetchData = iterable => {
+const fetchData = (iterable) => {
   const dataChangedStream = iterable
     .map(({action, store}) => store.scheduler.period)
     .distinctUntilChanged()
     .debounce(250);
 
-  const fetchStream = dataChangedStream.flatMap(period => {
+  const fetchStream = dataChangedStream.flatMap((period) => {
     const startDate = period.get('startDate');
     const endDate = period.get('endDate');
     const timezone = period.get('timezone');
 
     return Observable
       .fromPromise(fetchEvents({startDate, endDate, timezone}))
-      .map(data => {
+      .map((data) => {
         const { response, error } = data;
         if (response) {
           const events = response.entities.events;
@@ -55,11 +55,11 @@ const fetchData = iterable => {
   });
 
   const isLoadingStream = dataChangedStream
-    .map(x => true)
-    .merge(fetchStream.map(x => false))
+    .map((x) => true)
+    .merge(fetchStream.map((x) => false))
     .distinctUntilChanged()
-    .filter(x => x)
-    .map(x => EventsActions.pushFetching());
+    .filter((x) => x)
+    .map((x) => EventsActions.pushFetching());
 
   return fetchStream.merge(isLoadingStream);
 };
@@ -79,22 +79,22 @@ const positionTriggers = [
   EventsActions.actionTypes.DELETE_EVENT_SUCCESS
 ];
 
-const positionEvents = iterable => iterable
+const positionEvents = (iterable) => iterable
   .filter(actionPredicate(positionTriggers))
-  .map(value => positionMonthsEvents(value.store.scheduler))
-  .map(positioned => EventsActions.updatePositioned(positioned));
+  .map((value) => positionMonthsEvents(value.store.scheduler))
+  .map((positioned) => EventsActions.updatePositioned(positioned));
 
 // ------------------------
 // Modify Events In Backend
 // ------------------------
 
-const insertEventInBackend = iterable => iterable
+const insertEventInBackend = (iterable) => iterable
   .filter(actionPredicate([EventsActions.actionTypes.INSERT_EVENT]))
   .flatMap(({action, store}) => {
     const timezone = store.scheduler.period.get('timezone');
 
     return Observable.fromPromise(insertEvent(action.evnt, timezone))
-      .map(result => {
+      .map((result) => {
         if (result.error) {
           return EventsActions.insertEventFailure(result.error, action.evnt.id);
         } else {
@@ -103,13 +103,13 @@ const insertEventInBackend = iterable => iterable
       });
   });
 
-const updateEventInBackend = iterable => iterable
+const updateEventInBackend = (iterable) => iterable
   .filter(actionPredicate([EventsActions.actionTypes.UPDATE_EVENT]))
   .flatMap(({action, store}) => {
     const timezone = store.scheduler.period.get('timezone');
 
     return Observable.fromPromise(updateEvent(action.evnt, timezone))
-      .map(result => {
+      .map((result) => {
         if (result.error) {
           return EventsActions.updateEventFailure(result.error, action.evnt.id);
         } else {
@@ -118,11 +118,11 @@ const updateEventInBackend = iterable => iterable
       });
   });
 
-const deleteEventInBackend = iterable => iterable
+const deleteEventInBackend = (iterable) => iterable
   .filter(actionPredicate([EventsActions.actionTypes.DELETE_EVENT]))
   .flatMap(({action, store}) => {
     return Observable.fromPromise(deleteEvent(action.id))
-      .map(result => {
+      .map((result) => {
         if (result.error) {
           return EventsActions.deleteEventFailure(result.error, action.id);
         } else {
@@ -135,7 +135,7 @@ const deleteEventInBackend = iterable => iterable
 // Modfiy Notifications
 // --------------------
 
-const notifications = iterable => {
+const notifications = (iterable) => {
   const insertSuccess = iterable
     .filter(actionPredicate([EventsActions.actionTypes.INSERT_EVENT_SUCCESS]))
     .map(({action, store}) => {
@@ -188,7 +188,7 @@ const notifications = iterable => {
 // System for hiding notifications:  start refreshes
 // cancel timer and cancel yields cancel and terminates
 // the timer<button>Click me</button>
-const hideNotification = iterable => {
+const hideNotification = (iterable) => {
   const startNotifyStream = iterable
     .filter(actionPredicate([NotificationActions.actionTypes.SET_NOTIFICATION]));
 
@@ -196,7 +196,7 @@ const hideNotification = iterable => {
     .filter(actionPredicate([NotificationActions.actionTypes.CANCEL_NOTIFICATION]));
 
   return Observable.amb(cancelNotifyStream, startNotifyStream.debounce(3000))
-    .map(x => NotificationActions.clearNotification())
+    .map((x) => NotificationActions.clearNotification())
     .take(1)
     .repeat();
 };
@@ -205,7 +205,7 @@ const hideNotification = iterable => {
 // Mouse Drag
 // ----------
 
-const dragger = iterable => {
+const dragger = (iterable) => {
   const { UPDATE_RECTS, CANCEL_DRAG, ENTER_CELL, NEW_MOUSE_DOWN, EDIT_MOUSE_DOWN } = DragActions.actionTypes;
 
   const documentMouseUp = Observable.fromEvent(document, 'mouseup');
@@ -213,19 +213,19 @@ const dragger = iterable => {
 
   const cancelDragStream = iterable
     .filter(actionPredicate([CANCEL_DRAG]))
-    .map(x => x.action);
+    .map((x) => x.action);
 
   const enterCellStream = iterable
     .filter(actionPredicate([ENTER_CELL]))
-    .map(x => x.action);
+    .map((x) => x.action);
 
   const updateRectsStream = iterable
     .filter(actionPredicate([UPDATE_RECTS]))
-    .map(x => x.store.scheduler.drag.rects);
+    .map((x) => x.store.scheduler.drag.rects);
 
   const newMouseDownStream = iterable
     .filter(actionPredicate([NEW_MOUSE_DOWN]))
-    .map(x => x.action);
+    .map((x) => x.action);
 
   const editMouseDown = iterable
     .filter(actionPredicate([EDIT_MOUSE_DOWN]));
@@ -235,7 +235,7 @@ const dragger = iterable => {
 
   // Helpers
   const point = (x, y) => ({x, y});
-  const mousePoint = mouseEvent => point(mouseEvent.pageX, mouseEvent.pageY);
+  const mousePoint = (mouseEvent) => point(mouseEvent.pageX, mouseEvent.pageY);
 
   const grabOriginPosition = (mouseEvent, pageOffset, wideRect, gridRect, isWide) => {
     if (isWide) {
@@ -262,7 +262,7 @@ const dragger = iterable => {
   const newDragStream = newMouseDownStream
     .flatMap(({date: downDate, mouseEvent: downMouseEvent}) => {
       const cellChanges = enterCellStream
-        .distinctUntilChanged(x => x.date)
+        .distinctUntilChanged((x) => x.date)
         .map(({date, mouseEvent}) => ({
           lastCell: date,
           mouse: mousePoint(mouseEvent)
@@ -273,7 +273,7 @@ const dragger = iterable => {
           initialDrag: true,
           mouse: mousePoint(downMouseEvent)
         })
-        .merge(documentMouseUp.map(mouseEvent => ({
+        .merge(documentMouseUp.map((mouseEvent) => ({
           up: true,
           mouse: mousePoint(mouseEvent)
         })))
@@ -327,7 +327,7 @@ const dragger = iterable => {
 
     return cellChanges
       .startWith(initialData)
-      .merge(documentMouseUp.map(mouseEvent =>
+      .merge(documentMouseUp.map((mouseEvent) =>
         ({up: true, mouse: mousePoint(mouseEvent)})
       ))
       .combineLatest(
@@ -369,12 +369,12 @@ const dragger = iterable => {
 
   // Map to the action
   const cancelOnRightClick = documentMouseDown
-    .filter(e => e.button !== 0)
-    .map(x => DragActions.cancelDrag());
+    .filter((e) => e.button !== 0)
+    .map((x) => DragActions.cancelDrag());
 
   const updateStream = Observable.amb(newDragStream, editDragStream)
     .repeat()
-    .flatMap(x => {
+    .flatMap((x) => {
       const result = [DragActions.updateDrag(x)];
 
       if (x.dragType === DRAG_TYPES.edit && x.stopDrag) {
@@ -386,7 +386,7 @@ const dragger = iterable => {
     });
 
   const resetDragStream = cancelDragStream
-    .map(x => DragActions.resetDrag());
+    .map((x) => DragActions.resetDrag());
 
   return Observable.merge(resetDragStream, cancelOnRightClick, updateStream);
 };

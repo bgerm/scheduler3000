@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import SchedulerModal from './SchedulerModal';
 import EventTime from './EventTime';
@@ -17,7 +18,8 @@ export default class SummaryModal extends React.Component {
     return (
       <SchedulerModal onClose={onClose}>
         <div className='modal-header' style={{padding: '8px 0'}}>
-          <button type='button' className='close' data-dismiss='modal' aria-label='Close' onClick={onClose} tabIndex='-1'>
+          <button type='button' className='close' data-dismiss='modal' aria-label='Close'
+            onClick={onClose} tabIndex='-1'>
             <span aria-hidden='true'>×</span>
           </button>
           <h6 className='modal-title' style={{'width': 'calc(100% - 1.1em)'}}>Event Summary</h6>

@@ -1,3 +1,4 @@
+import React from 'react';
 import {PropTypes} from 'react';
 import {Gateway} from 'react-gateway';
 import ReactModal2 from 'react-modal2';

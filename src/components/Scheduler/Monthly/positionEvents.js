@@ -14,7 +14,7 @@ function overlaps(event1, event2) {
 }
 
 function firstRowWithoutOverlaps(event, rows) {
-  return findIndex(rows, row => !overlaps(last(row), event));
+  return findIndex(rows, (row) => !overlaps(last(row), event));
 }
 
 const positionedEvent = (eventKey, events, weekStartDate, weekEndDate) => {
@@ -45,9 +45,9 @@ function collapse(data, showCount, startDate, endDate) {
 
   for (let d = startDate; d <= endDate; d = d.clone().add(1, 'days')) {
     const end = d.clone().endOf('day');
-    const overlapping = flattenedRest.filter(x => {
+    const overlapping = flattenedRest.filter((x) => {
       return overlaps(x, {startDate: d, endDate: end});
-    }).map(x => x.id);
+    }).map((x) => x.id);
 
     days.push({
       id: overlapping,
@@ -65,7 +65,7 @@ function collapse(data, showCount, startDate, endDate) {
   const stopRow = (data[showCount] || []).reduce((acc, val) => { acc[val.id] = val; return acc; }, {});
 
   const stopRowWithOverlaps = (data[showCount] || []).reduce((acc, val) => {
-    acc[val.id] = days.find(x => x.id.length > 1 && x.id.includes(val.id)) !== undefined;
+    acc[val.id] = days.find((x) => x.id.length > 1 && x.id.includes(val.id)) !== undefined;
     return acc;
   }, {});
 
@@ -76,14 +76,14 @@ function collapse(data, showCount, startDate, endDate) {
   //   to the firt element in that id list if
   //   the position start is equal to the day it's on
   //   and it's a stop row without overlaps
-  const moreRow = days.filter(x => {
+  const moreRow = days.filter((x) => {
     if (x.id.length === 0) { return false; };
     if (x.id.length !== 1) { return true; };
 
     const id = x.id[0];
     const pos = stopRow[id];
     return stopRowWithOverlaps[id] || pos && x.start === pos.start || !pos;
-  }).map(x => {
+  }).map((x) => {
     if (x.id.length !== 1) { return x; };
 
     const pos = stopRow[x.id[0]];
@@ -104,8 +104,8 @@ export default function positionEvents(weekEvents, events, startDate, endDate, s
   }
 
   const sortedEvents = orderBy(weekEvents,
-    [x => moment.max(events.events[x].startDate, startDate).valueOf(),
-     x => moment.min(events.events[x].endDate, endDate).valueOf()],
+    [(x) => moment.max(events.events[x].startDate, startDate).valueOf(),
+     (x) => moment.min(events.events[x].endDate, endDate).valueOf()],
     ['asc', 'desc']
   );
 
@@ -122,7 +122,7 @@ export default function positionEvents(weekEvents, events, startDate, endDate, s
     }
   });
 
-  const result = rows.map(x => x.map(y => positionedEvent(y.id, events, startDate, endDate)));
+  const result = rows.map((x) => x.map((y) => positionedEvent(y.id, events, startDate, endDate)));
   if (showCount) {
     return collapse(result, showCount, startDate, endDate);
   } else {

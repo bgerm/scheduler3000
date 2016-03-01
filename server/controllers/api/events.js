@@ -1,34 +1,35 @@
-import express from 'express';
-import Event from '../../models/event';
-import { reduce, mapKeys } from 'lodash';
+import Router from 'koa-router';
 import moment from 'moment-timezone';
-
-const router = express.Router();
+import Event from '../../models/event';
 
 // converts from utc to timezone and back to utc
 // TODO more efficient
 const sameDayUTC = (utc, timezone) => {
   const { years, months, date } = moment.utc(utc).tz(timezone).toObject();
   return moment.utc([years, months, date]);
-}
+};
 
 const jsonError = (message) => {
   return {
     error: {
       message: message
-    } 
+    }
   };
-}
+};
 
-router.route('/events')
-  .get((req, res) => {
-    const { startDate, endDate, timezone } = req.query;
+const eventsRouter = new Router({
+  prefix: '/api/events'
+});
+
+eventsRouter
+  .get('/', function* (next) {
+    const { startDate, endDate, timezone } = this.request.query;
 
     if (!startDate || !endDate) {
-      res.json(jsonError('startDate and endDate required'))
+      this.body = jsonError('startDate and endDate required');
       return;
     } else if (!timezone) {
-      res.json(jsonError('timezone is required'))
+      this.body = jsonError('timezone is required');
       return;
     }
 
@@ -50,87 +51,90 @@ router.route('/events')
       ]
     };
 
-    Event.find(filter, '_id title startDate endDate allDay')
-      .then(result => {
-        res.json({events: result.map(x => x.toJSON({timezone}))})
-      })
-      .catch(err =>
-        res.json(jsonError(err.message))
-      );
+    try {
+      const events = yield Event.find(filter, '_id title startDate endDate allDay');
+      this.body = {events: events.map((x) => x.toJSON({timezone}))};
+    } catch (err) {
+      this.body = jsonError(err.message);
+    }
   })
 
-  .post((req, res) => {
-    const event = new Event(req.body);
-    event.save()
-      .then(result =>
-        res.json({event: event.toJSON()})
-      )
-      .catch(err =>
-        res.json(jsonError(err.message))
-      );
-  });
+  .post('/', function* (next) {
+    try {
+      const { timezone } = this.request.body;
 
-router.route('/events/:id')
-  .get((req, res) => {
-    Event.findOne({_id: req.params.id})
-      .then(result => {
-        if (result) {
-          res.json({event: result.toJSON()});
-        } else {
-          res.json(jsonError('not found'));
-        }
-      })
-      .catch(err =>
-        res.json(jsonError(err.message))
-      );
+      const event = new Event(this.request.body);
+      event.startDate = sameDayUTC(moment.utc(event.startDate), timezone);
+      event.endDate = sameDayUTC(moment.utc(event.endDate), timezone).endOf('day');
+
+      const saved = yield event.save();
+
+      this.body = {event: saved.toJSON({timezone})};
+    } catch (err) {
+      this.body = jsonError(err.message);
+    }
   })
 
-  .put((req, res) => {
-    const { timezone } = req.body;
+  .get('/:id', function* (next) {
+    try {
+      const { timezone } = this.request.query;
+
+      const event = yield Event.findOne({_id: this.params.id});
+      if (event) {
+        this.body = {event: event.toJSON({timezone})};
+      } else {
+        this.body = jsonError('not found');
+      }
+    } catch (err) {
+      this.body = jsonError(err.message);
+    }
+  })
+
+  .put('/:id', function* (next) {
+    const { timezone } = this.request.body;
 
     if (!timezone) {
-      res.json(jsonError('timezone is required'))
+      this.body = jsonError('timezone is required');
       return;
     }
 
-    Event.findOne({_id: req.params.id})
-      .then(event => {
-        const allDay = req.body.allDay || event.allDay;
+    try {
+      const event = yield Event.findOne({_id: this.params.id});
 
-        for (let prop in req.body) {
-          const value = req.body[prop];
+      if (!event) {
+        this.body = jsonError('not found');
+        return;
+      }
 
-          if (prop === 'startDate' && allDay) {
-            event[prop] = sameDayUTC(moment.utc(value), timezone);
-          } else if (prop === 'endDate' && allDay) {
-            event[prop] = sameDayUTC(moment.utc(value), timezone).endOf('day');
-          } else {
-            event[prop] = value;
-          }
+      const allDay = this.request.body.allDay || event.allDay;
+
+      for (let prop in this.request.body) {
+        const value = this.request.body[prop];
+
+        if (prop === 'startDate' && allDay) {
+          event[prop] = sameDayUTC(moment.utc(value), timezone);
+        } else if (prop === 'endDate' && allDay) {
+          event[prop] = sameDayUTC(moment.utc(value), timezone).endOf('day');
+        } else {
+          event[prop] = value;
         }
+      }
 
-        event.save()
-          .then(result =>
-            res.json(result.toJSON({timezone}))
-          )
-          .catch(err => {
-            res.json(jsonError(err.message))
-          });
-        }
-      )
-      .catch(err => {
-        res.json(jsonError(err.message))
-      });
+      const saved = yield event.save();
+
+      this.body = saved.toJSON({timezone});
+    } catch (err) {
+      this.body = jsonError(err.message);
+    }
   })
 
-  .delete((req, res) => {
-    Event.remove({_id: req.params.id})
-      .then(result =>
-        res.json({id: req.params.id, success: true})
-      )
-      .catch(err =>
-        res.json(jsonError(err.message))
-      );
+  .delete('/:id', function* (next) {
+    try {
+      yield Event.remove({_id: this.params.id});
+      this.body = {id: this.params.id, success: true};
+    } catch (err) {
+      this.body = jsonError(err.message);
+    }
   });
 
-export default router;
+export default eventsRouter;

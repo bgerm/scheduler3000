@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import styles from './ShowMorePopover.scss';
 import CSSModules from 'react-css-modules';
@@ -73,7 +74,7 @@ class ShowMorePopover extends React.Component {
   }
 
   renderEvents(ids, events) {
-    return ids.map(id => {
+    return ids.map((id) => {
       const evnt = events[id];
       return <div key={evnt.id} styleName='event'>{evnt.title}</div>;
     });
@@ -99,11 +100,11 @@ class ShowMorePopover extends React.Component {
       <div className='popover' styleName={popoverClassNames} style={popoverStyle} ref='popover'>
         <div className='popover-arrow'></div>
         <h3 className='popover-title'>
-          { startDate.format('dddd, MMMM D') }
+          {startDate.format('dddd, MMMM D')}
         </h3>
 
         <div className='popover-content'>
-          { this.renderEvents(ids, events) }
+          {this.renderEvents(ids, events)}
         </div>
       </div>
     );

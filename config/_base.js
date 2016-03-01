@@ -1,16 +1,16 @@
 /* eslint key-spacing:0 spaced-comment:0 */
-import _debug from 'debug'
-import path from 'path'
-import { argv } from 'yargs'
+import _debug from 'debug';
+import path from 'path';
+import { argv } from 'yargs';
 
-const debug = _debug('app:config:_base')
+const debug = _debug('app:config:_base');
 const config = {
-  env : process.env.NODE_ENV,
+  env : process.env.NODE_ENV || 'development',
 
   // ----------------------------------
   // Project Structure
   // ----------------------------------
-  path_base  : path.resolve(__dirname, '../'),
+  path_base  : path.resolve(__dirname, '..'),
   dir_client : 'src',
   dir_dist   : 'dist',
   dir_server : 'server',
@@ -19,23 +19,18 @@ const config = {
   // ----------------------------------
   // Server Configuration
   // ----------------------------------
-  server_host : '0.0.0.0',
+  server_host : 'localhost',
   server_port : process.env.PORT || 3000,
 
   // ----------------------------------
   // Compiler Configuration
   // ----------------------------------
   compiler_css_modules     : true,
-  compiler_enable_hmr      : false,
-  compiler_globals         : {
-    'React' : 'react',
-    'ReactDOM' : 'react-dom'
-  },
-  compiler_source_maps     : true,
+  compiler_devtool         : 'source-map',
   compiler_hash_type       : 'hash',
   compiler_fail_on_warning : false,
   compiler_quiet           : false,
-  compiler_public_path     : '/',
+  compiler_public_path     : '',
   compiler_stats           : {
     chunks : false,
     chunkModules : false,
@@ -46,9 +41,8 @@ const config = {
     'react',
     'react-redux',
     'react-router',
-    'redux',
-    'redux-actions',
-    'redux-simple-router'
+    'react-router-redux',
+    'redux'
   ],
 
   // ----------------------------------
@@ -57,9 +51,9 @@ const config = {
   coverage_enabled   : !argv.watch,
   coverage_reporters : [
     { type : 'text-summary' },
-    { type : 'html', dir : 'coverage' }
+    { type : 'lcov', dir : 'coverage' }
   ]
-}
+};
 
 /************************************************
 -------------------------------------------------
@@ -73,6 +67,7 @@ Edit at Your Own Risk
 // ------------------------------------
 // Environment
 // ------------------------------------
+// N.B.: globals added here must _also_ be added to .eslintrc
 config.globals = {
   'process.env'  : {
     'NODE_ENV' : JSON.stringify(config.env)
@@ -80,40 +75,42 @@ config.globals = {
   'NODE_ENV'     : config.env,
   '__DEV__'      : config.env === 'development',
   '__PROD__'     : config.env === 'production',
+  '__TEST__'     : config.env === 'test',
   '__DEBUG__'    : config.env === 'development' && !argv.no_debug,
-  '__DEBUG_NEW_WINDOW__' : !!argv.nw
-}
+  '__DEBUG_NEW_WINDOW__' : !!argv.nw,
+  '__BASENAME__' : JSON.stringify(process.env.BASENAME || '')
+};
 
 // ------------------------------------
 // Validate Vendor Dependencies
 // ------------------------------------
-const pkg = require('../package.json')
+const pkg = require('../package.json');
 
 config.compiler_vendor = config.compiler_vendor
-  .filter(dep => {
-    if (pkg.dependencies[dep]) return true
+  .filter((dep) => {
+    if (pkg.dependencies[dep]) return true;
 
     debug(
       `Package "${dep}" was not found as an npm dependency in package.json; ` +
-      `it won't be included in the webpack vendor bundle.\n` +
-      `Consider removing it from vendor_dependencies in ~/config/index.js`
-    )
-  })
+      `it won't be included in the webpack vendor bundle.
+       Consider removing it from vendor_dependencies in ~/config/index.js`
+    );
+  });
 
 // ------------------------------------
 // Utilities
 // ------------------------------------
 config.utils_paths = (() => {
-  const resolve = path.resolve
+  const resolve = path.resolve;
 
   const base = (...args) =>
-    resolve.apply(resolve, [config.path_base, ...args])
+    resolve.apply(resolve, [config.path_base, ...args]);
 
   return {
     base   : base,
     client : base.bind(null, config.dir_client),
     dist   : base.bind(null, config.dir_dist)
-  }
-})()
+  };
+})();
 
-export default config
+export default config;

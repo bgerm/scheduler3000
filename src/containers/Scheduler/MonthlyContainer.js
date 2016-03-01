@@ -1,3 +1,4 @@
+import React from 'react';
 import { PropTypes } from 'react';
 import classNames from 'classNames';
 import DaysOfWeek from 'components/Scheduler/Monthly/DaysOfWeek';
@@ -64,7 +65,7 @@ export default class MonthlyContainer extends React.Component {
             editMouseDown={dragActions.editMouseDown}
             updateShowLimit={eventsActions.updateShowLimit}
           />
-          { drag.dragType === DRAG_TYPES.create &&
+          {drag.dragType === DRAG_TYPES.create &&
             drag.stopDrag && (
             <NewModal
               onClose={dragActions.cancelDrag}
@@ -76,7 +77,7 @@ export default class MonthlyContainer extends React.Component {
               insertEvent={eventsActions.insertEvent}
             />
           )}
-          { drag.dragType === DRAG_TYPES.show &&
+          {drag.dragType === DRAG_TYPES.show &&
             drag.stopDrag && (
             <SummaryModal
               onClose={dragActions.cancelDrag}

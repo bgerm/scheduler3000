@@ -1,3 +1,4 @@
+import React, { PropTypes } from 'react';
 import Header from 'components/Header/Header';
 import styles from './MainLayout.scss';
 import CSSModules from 'react-css-modules';
@@ -24,7 +25,7 @@ function MainLayout ({ children }) {
 }
 
 MainLayout.propTypes = {
-  children: React.PropTypes.element
+  children: PropTypes.element
 };
 
 export default CSSModules(MainLayout, styles, {allowMultiple: true});
