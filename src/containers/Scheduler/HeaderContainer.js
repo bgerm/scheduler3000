@@ -5,7 +5,7 @@ import CSSModules from 'react-css-modules';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as PeriodActions from 'redux/modules/scheduler/period';
-import { pushPath } from 'redux-simple-router';
+import { push } from 'react-router-redux';
 import classNames from 'classNames';
 
 const propTypes = {
@@ -19,6 +19,13 @@ const propTypes = {
 };
 
 export default class HeaderContainer extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleMonthlyClick = () => props.dispatch(push('/scheduler/monthly'));
+    this.handleWeeklyClick = () => props.dispatch(push('/scheduler/weekly'));
+  }
+
   prettyDate() {
     const { period } = this.props;
 
@@ -37,7 +44,7 @@ export default class HeaderContainer extends React.Component {
   }
 
   render() {
-    const { notification, dispatch, nextPeriod, previousPeriod, toToday, isFetching } = this.props;
+    const { notification, nextPeriod, previousPeriod, toToday, isFetching } = this.props;
 
     const spinnerStyleName = classNames(
       'spinner',
@@ -74,9 +81,9 @@ export default class HeaderContainer extends React.Component {
         <div styleName='topbar-right'>
           <div className='btn-group' role='group' aria-label='Change'>
             <button type='button' className='btn btn-sm btn-secondary'
-              onClick={() => dispatch(pushPath('/scheduler/weekly'))}>Weekly</button>
+              onClick={this.handleWeeklyClick}>Weekly</button>
             <button type='button' className='btn btn-sm btn-secondary'
-              onClick={() => dispatch(pushPath('/scheduler/monthly'))}>Monthly</button>
+              onClick={this.handleMonthlyClick}>Monthly</button>
           </div>
         </div>
       </div>
