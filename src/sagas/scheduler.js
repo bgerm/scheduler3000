@@ -6,6 +6,7 @@ import { fetchEvents, insertEvent, updateEvent, deleteEvent } from 'services/api
 import * as EventsActions from 'redux/modules/scheduler/events';
 import * as NotificationActions from 'redux/modules/scheduler/notification';
 import * as DragActions from 'redux/modules/scheduler/drag';
+import * as PeriodActions from 'redux/modules/scheduler/period';
 import positionMonthsEvents from 'components/Scheduler/Monthly/positionMonthsEvents';
 
 const actionPredicate = (actions) =>
@@ -22,7 +23,9 @@ const changePeriodOnPathChange = (iterable) => iterable
   .map((value) => value.action)
   .map((routeChange) => routeChange.payload.pathname)
   .filter((path) => path.indexOf('/scheduler') >= 0)
-  .map((path) => changePeriod(path.split('/')[2]));
+  .map((path) => path.split('/')[2])
+  .filter((period) => period)
+  .map((period) => changePeriod(period));
 
 // ---------------------------
 // Fetch data on period change
@@ -30,6 +33,7 @@ const changePeriodOnPathChange = (iterable) => iterable
 
 const fetchData = (iterable) => {
   const dataChangedStream = iterable
+    .filter(actionPredicate(Object.values(PeriodActions.actionTypes)))
     .map(({action, store}) => store.scheduler.period)
     .distinctUntilChanged()
     .debounce(250);

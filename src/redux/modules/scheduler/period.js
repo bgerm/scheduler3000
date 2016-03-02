@@ -11,6 +11,14 @@ const CHANGE_PERIOD = 'scheduler/period/CHANGE_PERIOD';
 const CHANGE_TIMEZONE = 'scheduler/period/CHANGE_TIMEZONE';
 const SET_TODAY = 'scheduler/period/SET_TODAY';
 
+export const actionTypes = {
+  SET_START_DATE,
+  NEXT_PERIOD,
+  PREVIOUS_PERIOD,
+  CHANGE_PERIOD,
+  CHANGE_TIMEZONE
+};
+
 export const PERIOD_TYPES = {
   monthly: 'monthly',
   weekly: 'weekly',
@@ -86,32 +94,32 @@ export default function startDate(state = initialState, action) {
   switch (action.type) {
     case SET_START_DATE:
       return state.merge({
-        ...periodBounds(state.get('period'), action.date),
-        period: action.period,
+        ...periodBounds(action.period, action.date),
+        periodType: action.period,
         selectedDate: action.date
       });
 
     case NEXT_PERIOD:
       const nextDate =
-        findNextPeriod(state.get('period'), state.get('selectedDate'));
+        findNextPeriod(state.get('periodType'), state.get('selectedDate'));
 
       return state.merge({
         selectedDate: nextDate,
-        ...periodBounds(state.get('period'), nextDate)
+        ...periodBounds(state.get('periodType'), nextDate)
       });
 
     case PREVIOUS_PERIOD:
       const previousDate =
-        findPreviousPeriod(state.get('period'), state.get('selectedDate'));
+        findPreviousPeriod(state.get('periodType'), state.get('selectedDate'));
 
       return state.merge({
         selectedDate: previousDate,
-        ...periodBounds(state.get('period'), previousDate)
+        ...periodBounds(state.get('periodType'), previousDate)
       });
 
     case CHANGE_PERIOD:
       return state.merge({
-        period: action.period,
+        periodType: action.period,
         ...periodBounds(action.period, state.get('selectedDate'))
       });
 
