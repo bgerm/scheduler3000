@@ -15,6 +15,7 @@ export default class SummaryModal extends React.Component {
     const { deleteEvent, onClose, events, eventId } = this.props;
     const evnt = events[eventId];
 
+    /* eslint-disable react/jsx-no-bind */
     return (
       <SchedulerModal onClose={onClose}>
         <div className='modal-header' style={{padding: '8px 0'}}>
@@ -39,6 +40,7 @@ export default class SummaryModal extends React.Component {
         </div>
       </SchedulerModal>
     );
+    /* eslint-enable react/jsx-no-bind */
   }
 }
 

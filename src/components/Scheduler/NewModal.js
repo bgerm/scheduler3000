@@ -32,6 +32,8 @@ export default class NewModal extends React.Component {
         allDay: true
       }
     );
+
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(e) {
@@ -59,7 +61,7 @@ export default class NewModal extends React.Component {
           </button>
           <h6 className='modal-title' style={{'width': 'calc(100% - 1.1em)'}}>New Event</h6>
         </div>
-        <form onSubmit={(e) => this.handleSubmit(e)}>
+        <form onSubmit={this.handleSubmit}>
           <div className='form-group row'>
             <label className='col-sm-2 form-control-label'>When</label>
             <div className='col-sm-10' style={{padding: '.375rem 1rem'}}>

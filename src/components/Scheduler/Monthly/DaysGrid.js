@@ -86,6 +86,7 @@ class DaysGrid extends React.Component {
         {[this.dragStyleName()]: this.shouldHighlightDay(x)}
       );
 
+      /* eslint-disable react/jsx-no-bind */
       return (
         <div
           styleName={styleNames}
@@ -94,6 +95,7 @@ class DaysGrid extends React.Component {
           onMouseDown={(e) => e.button === 0 && newMouseDown(e, x)}
         ></div>
       );
+      /* eslint-enable react/jsx-no-bind */
     });
 
     const draggerStyleNames = classNames(

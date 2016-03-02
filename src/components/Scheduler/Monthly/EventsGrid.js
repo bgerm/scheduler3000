@@ -18,8 +18,10 @@ const propTypes = {
 class EventsGrid extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {height: null, target: null, targetId: null, targetStartDate: null};
+    this.state = {target: null, targetId: null, targetStartDate: null};
     this.handleResize = this.handleResize.bind(this);
+    this.resetTargetState = this.resetTargetState.bind(this);
+    this.showMoreEvents = this.showMoreEvents.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -34,6 +36,10 @@ class EventsGrid extends React.Component {
     this.setState({target: event.target, targetId: ids, targetStartDate: startDate});
   }
 
+  resetTargetState() {
+    this.setState({target: null, targetId: null, targetStartDate: null});
+  }
+
   renderPopover () {
     if (this.state.targetId === null) return null;
 
@@ -44,7 +50,7 @@ class EventsGrid extends React.Component {
         events={this.props.events}
         ids={this.state.targetId}
         startDate={this.state.targetStartDate}
-        onClose={() => this.setState({targetId: null, target: null})}
+        onClose={this.resetTargetState}
       />
     );
   }
@@ -104,7 +110,7 @@ class EventsGrid extends React.Component {
         events={events}
         positioned={weekPositions}
         key={x.valueOf()}
-        showMoreEvents={this.showMoreEvents.bind(this)}
+        showMoreEvents={this.showMoreEvents}
       />);
     });
 

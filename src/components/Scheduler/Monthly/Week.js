@@ -50,6 +50,7 @@ class Week extends React.Component {
         const moreRight = b.get('moreRight');
         const startDate = b.get('startDate');
 
+        /* eslint-disable react/jsx-no-bind */
         if (Immutable.List.isList(id)) {
           return (
             <div styleName={`start-${start} span-${span}`} key={`${start}-more`}>
@@ -63,6 +64,7 @@ class Week extends React.Component {
             </div>
           );
         }
+        /* eslint-enable react/jsx-no-bind */
 
         const evnt = events[id];
 
@@ -78,6 +80,7 @@ class Week extends React.Component {
           {'saving': evnt.saving}
         );
 
+        /* eslint-disable react/jsx-no-bind */
         return (
           <div styleName={`start-${start} span-${span}`} key={evnt.id}>
             <div styleName='event-block-wrapper' onMouseDown={(e) => !evnt.saving && this.edit(e, evnt)}>
@@ -89,6 +92,7 @@ class Week extends React.Component {
             </div>
           </div>
         );
+        /* eslint-enable react/jsx-no-bind */
       });
 
       return (
