@@ -1,4 +1,4 @@
-import { Observable } from 'rx';
+import Rx, { Observable } from 'rx';
 import { changePeriod } from 'redux/modules/scheduler/period';
 import { DRAG_TYPES } from 'redux/modules/scheduler/drag';
 import { memoize } from 'lodash';
@@ -8,6 +8,7 @@ import * as NotificationActions from 'redux/modules/scheduler/notification';
 import * as DragActions from 'redux/modules/scheduler/drag';
 import * as PeriodActions from 'redux/modules/scheduler/period';
 import positionMonthsEvents from 'components/Scheduler/Monthly/positionMonthsEvents';
+import 'utils/rxjs/add/takeWhileInclusive';
 
 const actionPredicate = (actions) =>
   (filterable) => actions.some((action) => (action) === filterable.action.type);
@@ -234,17 +235,17 @@ const dragger = (iterable) => {
   const editMouseDown = iterable
     .filter(actionPredicate([EDIT_MOUSE_DOWN]));
 
-  const endDragStream = documentMouseUp
-    .merge(cancelDragStream);
-
   // Helpers
   const point = (x, y) => ({x, y});
   const mousePoint = (mouseEvent) => point(mouseEvent.pageX, mouseEvent.pageY);
 
-  const grabOriginPosition = (mouseEvent, pageOffset, wideRect, gridRect, isWide) => {
+  const grabOriginPosition = (mouseEvent, pageOffset, rects, isWide) => {
+    const gridRect = rects.grid;
+
     if (isWide) {
       const scrollOffsetX = (document.body || document.documentElement).scrollLeft;
       const originMouse = mousePoint(mouseEvent);
+      const wideRect = rects.wideSizer;
 
       return {
         left: originMouse.x - gridRect.left - (wideRect.width / 3) - scrollOffsetX,
@@ -265,33 +266,30 @@ const dragger = (iterable) => {
   // For creating new events
   const newDragStream = newMouseDownStream
     .flatMap(({date: downDate, mouseEvent: downMouseEvent}) => {
-      const cellChanges = enterCellStream
-        .distinctUntilChanged((x) => x.date)
-        .map(({date, mouseEvent}) => ({
-          lastCell: date,
-          mouse: mousePoint(mouseEvent)
-        }));
-
-      return cellChanges
-        .startWith({
-          initialDrag: true,
-          mouse: mousePoint(downMouseEvent)
-        })
-        .merge(documentMouseUp.map((mouseEvent) => ({
-          up: true,
-          mouse: mousePoint(mouseEvent)
-        })))
-        .scan((lastDragInfo, current) => {
+      return Rx.Observable
+        .combineLatest(
+          enterCellStream
+            .distinctUntilChanged((x) => x.date)
+            .startWith({date: downDate, mouseEvent: downMouseEvent})
+            .map(({date, mouseEvent}) => ({
+              lastCell: date,
+              mouse: mousePoint(mouseEvent)
+            })),
+          documentMouseUp.startWith(null),
+          cancelDragStream.startWith(null),
+          (mouseMoves, mouseUp, cancel) => ({mouseMoves, mouseUp, cancel}))
+        .map((x, idx) => {
           return {
-            ...current,
             dragType: DRAG_TYPES.create,
             startCell: downDate,
-            lastCell: current.lastCell || lastDragInfo.lastCell || downDate,
-            initialDrag: current.initialDrag === true,
-            stopDrag: current.up
+            lastCell: x.mouseMoves.lastCell,
+            initialDrag: idx === 0,
+            stopDrag: x.mouseUp !== null,
+            cancel: x.cancel !== null
           };
-        }, {}).takeUntil(endDragStream);
-    }).takeUntil(cancelDragStream);
+        })
+        .takeWhileInclusive((x) => !(x.cancel || x.mouseUp));
+    }).takeWhile((x) => !x.cancel);
 
   // For editing events
   const editDragStream = editMouseDown.flatMap(({action, store}) => {
@@ -303,13 +301,12 @@ const dragger = (iterable) => {
       pageOffset: downPageOffset
     } = action;
 
-    const rects = store.scheduler.drag.rects;
-
     const lengthOfEvent = downEndDate.diff(downStartDate, 'days');
     const isWide = lengthOfEvent >= 1;
 
+    const rects = store.scheduler.drag.rects;
     const originMouse = mousePoint(downMouseEvent);
-    const originPosition = grabOriginPosition(downMouseEvent, downPageOffset, rects.wideSizer, rects.grid, isWide);
+    const originPosition = grabOriginPosition(downMouseEvent, downPageOffset, rects, isWide);
 
     const memoizedAddDays = memoize((date) => {
       if (!date) return null;
@@ -317,45 +314,45 @@ const dragger = (iterable) => {
       return date.clone().add(lengthOfEvent, 'days');
     });
 
-    const initialData = {
-      startCell: downStartDate,
-      mouse: originMouse,
-      initialDrag: true,
-      dragType: DRAG_TYPES.show
-    };
+    let lastDragType = DRAG_TYPES.show;
 
-    const cellChanges = enterCellStream.map(({mouseEvent, date}) => ({
-      startCell: date,
-      mouse: point(mouseEvent.pageX, mouseEvent.pageY)
-    }));
-
-    return cellChanges
-      .startWith(initialData)
-      .merge(documentMouseUp.map((mouseEvent) =>
-        ({up: true, mouse: mousePoint(mouseEvent)})
-      ))
+    return enterCellStream
+      .startWith({
+        date: downStartDate,
+        mouseEvent: downMouseEvent
+      })
+      .map(({mouseEvent, date}) => ({
+        startCell: date,
+        mouse: mousePoint(mouseEvent)
+      }))
       .combineLatest(
         updateRectsStream.startWith(rects),
-        (changes, updatedRect) => ({changes, updatedRect})
+        documentMouseUp.startWith(null),
+        cancelDragStream.startWith(null),
+        (changes, updatedRect, mouseUp, cancel) => ({changes, updatedRect, mouseUp, cancel})
       )
-      .scan((lastInfo, {changes: currentChanges, updatedRect}) => {
-        const inEdit = (lastInfo.dragType === DRAG_TYPES.edit ||
-          (lastInfo.dragType === DRAG_TYPES.show &&
-            mouseMovedEnough(currentChanges.mouse, initialData.mouse)));
-        const dragType = inEdit ? DRAG_TYPES.edit : DRAG_TYPES.show;
+      .map(({changes: currentChanges, updatedRect, mouseUp, cancel}, idx) => {
+        const inEdit = (lastDragType === DRAG_TYPES.edit ||
+          (lastDragType === DRAG_TYPES.show &&
+            mouseMovedEnough(currentChanges.mouse, originMouse)));
+
+        if (inEdit && lastDragType !== DRAG_TYPES.edit) {
+          lastDragType = DRAG_TYPES.edit;
+        }
 
         const sizerRect = isWide ? updatedRect.wideSizer : updatedRect.normalSizer;
         const gridRect = updatedRect.grid;
 
         return {
-          ...currentChanges,
-          dragType: dragType,
-          initialDrag: currentChanges.initialDrag === true,
+          mouse: currentChanges.mouse,
+          dragType: inEdit ? DRAG_TYPES.edit : DRAG_TYPES.show,
+          initialDrag: idx === 0,
           isWide: isWide,
-          lastCell: memoizedAddDays(lastInfo.startCell),
+          lastCell: memoizedAddDays(currentChanges.startCell),
           originPosition: originPosition,
-          startCell: currentChanges.startCell || lastInfo.startCell, // mouse up doesn't know where it is
-          stopDrag: currentChanges.up,
+          startCell: currentChanges.startCell,
+          stopDrag: mouseUp !== null,
+          cancel: cancel !== null,
           targetId: targetId,
           mouseDelta: point(
             Math.min(
@@ -368,8 +365,8 @@ const dragger = (iterable) => {
             )
           )
         };
-      }, {}).takeUntil(endDragStream);
-  }).takeUntil(cancelDragStream);
+      }).takeWhileInclusive((x) => !(x.cancel || x.mouseUp));
+  }).takeWhile((x) => !x.cancel);
 
   // Map to the action
   const cancelOnRightClick = documentMouseDown

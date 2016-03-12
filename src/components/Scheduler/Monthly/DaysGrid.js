@@ -25,10 +25,12 @@ class DaysGrid extends React.Component {
     this.handleResize();
 
     window.addEventListener('resize', this.handleResize);
+    window.addEventListener('scroll', this.handleResize);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('scroll', this.handleResize);
   }
 
   handleResize() {
