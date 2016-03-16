@@ -31,8 +31,8 @@ export const DRAG_TYPES = {
 const initialState = {
   dragType: DRAG_TYPES.none,
   dragging: false,
-  startCell: null,
-  lastCell: null,
+  startDate: null,
+  endDate: null,
   stopDrag: false,
   mouse: { x: 0, y: 0 },
   mouseDelta: {x: 0, y: 0},
@@ -121,14 +121,15 @@ export function enterCell(mouseEvent, date) {
 }
 
 // TODO
-export function editMouseDown(mouseEvent, targetId, startDate, endDate, pageOffset) {
+export function editMouseDown(mouseEvent, targetId, startDate, endDate, pageOffset, allDay) {
   return {
     type: EDIT_MOUSE_DOWN,
     mouseEvent,
     targetId,
     startDate,
     endDate,
-    pageOffset
+    pageOffset,
+    allDay
   };
 }
 

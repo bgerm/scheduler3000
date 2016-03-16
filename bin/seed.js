@@ -43,7 +43,19 @@ function seedNewEvents() {
     data(7, 7),
     data(8, 10),
     data(11, 16),
-    data(16, 18)
+    data(16, 18),
+    {
+      title: 'dinner time',
+      startDate: moment.tz(addDays(beginning, 20), 'America/New_York').hours(20).minutes(0).seconds(0),
+      endDate: moment.tz(addDays(beginning, 20), 'America/New_York').hours(21).minutes(59).seconds(59),
+      allDay: false
+    },
+    {
+      title: 'dinner time',
+      startDate: moment.tz(addDays(beginning, 21), 'America/New_York').hours(20).minutes(0).seconds(0),
+      endDate: moment.tz(addDays(beginning, 23), 'America/New_York').hours(21).minutes(59).seconds(59),
+      allDay: false
+    }
   ];
 
   const saved = newEvents.map((doc) => {

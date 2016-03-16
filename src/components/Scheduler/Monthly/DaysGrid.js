@@ -4,6 +4,7 @@ import CSSModules from 'react-css-modules';
 import classNames from 'classNames';
 import { range } from 'utils/DateHelpers';
 import { DRAG_TYPES } from 'redux/modules/scheduler/drag';
+import isBetween from 'utils/DateHelpers/isBetween';
 
 const propTypes = {
   period: PropTypes.object.isRequired,
@@ -50,12 +51,11 @@ class DaysGrid extends React.Component {
   }
 
   shouldHighlightDay(date) {
-    const { startCell, lastCell } = this.props.drag;
+    const { startDate, endDate } = this.props.drag;
 
-    if (!startCell || !lastCell) return false;
+    if (!startDate || !endDate) return false;
 
-    return ((startCell <= lastCell && date >= startCell && date <= lastCell) ||
-            (startCell > lastCell && date <= startCell && date >= lastCell));
+    return isBetween(date, startDate, endDate, 'days', '[]');
   }
 
   dragStyleName() {

@@ -1,7 +1,6 @@
 import Rx, { Observable } from 'rx';
 import { changePeriod } from 'redux/modules/scheduler/period';
 import { DRAG_TYPES } from 'redux/modules/scheduler/drag';
-import { memoize } from 'lodash';
 import { fetchEvents, insertEvent, updateEvent, deleteEvent } from 'services/api';
 import * as EventsActions from 'redux/modules/scheduler/events';
 import * as NotificationActions from 'redux/modules/scheduler/notification';
@@ -9,6 +8,7 @@ import * as DragActions from 'redux/modules/scheduler/drag';
 import * as PeriodActions from 'redux/modules/scheduler/period';
 import positionMonthsEvents from 'components/Scheduler/Monthly/positionMonthsEvents';
 import 'utils/rxjs/add/takeWhileInclusive';
+import copyTime from 'utils/DateHelpers/copyTime';
 
 const actionPredicate = (actions) =>
   (filterable) => actions.some((action) => (action) === filterable.action.type);
@@ -272,17 +272,24 @@ const dragger = (iterable) => {
             .distinctUntilChanged((x) => x.date)
             .startWith({date: downDate, mouseEvent: downMouseEvent})
             .map(({date, mouseEvent}) => ({
-              lastCell: date,
+              endDate: date,
               mouse: mousePoint(mouseEvent)
             })),
           documentMouseUp.startWith(null),
           cancelDragStream.startWith(null),
           (mouseMoves, mouseUp, cancel) => ({mouseMoves, mouseUp, cancel}))
         .map((x, idx) => {
+          const tmpStartDate = downDate;
+          const tmpEndDate = x.mouseMoves.endDate;
+
+          const [startDate, endDate] = tmpStartDate.isAfter(tmpEndDate)
+            ? [tmpEndDate, tmpStartDate]
+            : [tmpStartDate, tmpEndDate];
+
           return {
             dragType: DRAG_TYPES.create,
-            startCell: downDate,
-            lastCell: x.mouseMoves.lastCell,
+            startDate: startDate,
+            endDate: endDate,
             initialDrag: idx === 0,
             stopDrag: x.mouseUp !== null,
             cancel: x.cancel !== null
@@ -298,7 +305,8 @@ const dragger = (iterable) => {
       startDate: downStartDate,
       endDate: downEndDate,
       targetId,
-      pageOffset: downPageOffset
+      pageOffset: downPageOffset,
+      allDay
     } = action;
 
     const lengthOfEvent = downEndDate.diff(downStartDate, 'days');
@@ -308,33 +316,40 @@ const dragger = (iterable) => {
     const originMouse = mousePoint(downMouseEvent);
     const originPosition = grabOriginPosition(downMouseEvent, downPageOffset, rects, isWide);
 
-    const memoizedAddDays = memoize((date) => {
-      if (!date) return null;
-
-      return date.clone().add(lengthOfEvent, 'days');
-    });
-
     let lastDragType = DRAG_TYPES.show;
 
-    return enterCellStream
-      .startWith({
-        date: downStartDate,
-        mouseEvent: downMouseEvent
-      })
-      .map(({mouseEvent, date}) => ({
-        startCell: date,
+    const cellChangeStream = enterCellStream
+      .distinctUntilChanged((x) => x.date)
+      .startWith({date: downStartDate})
+      .map(({date}) => {
+        const tmpStartDate = date;
+        const tmpEndDate = tmpStartDate.clone().add(lengthOfEvent, 'days');
+
+        return {
+          startDate: allDay ? tmpStartDate : copyTime(downStartDate, tmpStartDate),
+          endDate: allDay ? tmpEndDate : copyTime(downEndDate, tmpEndDate)
+        };
+      });
+
+    const mouseChangeStream = enterCellStream
+      .startWith({mouseEvent: downMouseEvent})
+      .map(({mouseEvent}) => ({
         mouse: mousePoint(mouseEvent)
-      }))
+      }));
+
+    return cellChangeStream
       .combineLatest(
+        mouseChangeStream,
         updateRectsStream.startWith(rects),
         documentMouseUp.startWith(null),
         cancelDragStream.startWith(null),
-        (changes, updatedRect, mouseUp, cancel) => ({changes, updatedRect, mouseUp, cancel})
+        (cellChanges, mouseChanges, updatedRect, mouseUp, cancel) =>
+          ({cellChanges, mouseChanges, updatedRect, mouseUp, cancel})
       )
-      .map(({changes: currentChanges, updatedRect, mouseUp, cancel}, idx) => {
+      .map(({cellChanges, mouseChanges, updatedRect, mouseUp, cancel}, idx) => {
         const inEdit = (lastDragType === DRAG_TYPES.edit ||
           (lastDragType === DRAG_TYPES.show &&
-            mouseMovedEnough(currentChanges.mouse, originMouse)));
+            mouseMovedEnough(mouseChanges.mouse, originMouse)));
 
         if (inEdit && lastDragType !== DRAG_TYPES.edit) {
           lastDragType = DRAG_TYPES.edit;
@@ -344,23 +359,24 @@ const dragger = (iterable) => {
         const gridRect = updatedRect.grid;
 
         return {
-          mouse: currentChanges.mouse,
+          mouse: mouseChanges.mouse,
           dragType: inEdit ? DRAG_TYPES.edit : DRAG_TYPES.show,
           initialDrag: idx === 0,
           isWide: isWide,
-          lastCell: memoizedAddDays(currentChanges.startCell),
           originPosition: originPosition,
-          startCell: currentChanges.startCell,
+          startDate: cellChanges.startDate,
+          endDate: cellChanges.endDate,
           stopDrag: mouseUp !== null,
           cancel: cancel !== null,
           targetId: targetId,
+          allDay: allDay,
           mouseDelta: point(
             Math.min(
-              Math.max(currentChanges.mouse.x - originMouse.x, -originPosition.left),
+              Math.max(mouseChanges.mouse.x - originMouse.x, -originPosition.left),
               gridRect.right - sizerRect.width - originPosition.left - gridRect.left
             ),
             Math.min(
-              Math.max(currentChanges.mouse.y - originMouse.y, -originPosition.top),
+              Math.max(mouseChanges.mouse.y - originMouse.y, -originPosition.top),
               gridRect.bottom - sizerRect.height - originPosition.top - gridRect.top
             )
           )
@@ -379,7 +395,12 @@ const dragger = (iterable) => {
       const result = [DragActions.updateDrag(x)];
 
       if (x.dragType === DRAG_TYPES.edit && x.stopDrag) {
-        result.push(EventsActions.updateEvent({id: x.targetId, startDate: x.startCell, endDate: x.lastCell}));
+        result.push(EventsActions.updateEvent({
+          id: x.targetId,
+          startDate: x.startDate,
+          endDate: x.endDate,
+          allDay: x.allDay
+        }));
         result.push(DragActions.cancelDrag());
       }
 

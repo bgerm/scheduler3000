@@ -22,7 +22,7 @@ class Week extends React.Component {
     const { editMouseDown } = this.props;
     const pageOffset = event.target.getBoundingClientRect();
 
-    editMouseDown(event, evnt.id, evnt.startDate, evnt.endDate, pageOffset);
+    editMouseDown(event, evnt.id, evnt.startDate, evnt.endDate, pageOffset, evnt.allDay);
   }
 
   render() {
@@ -40,6 +40,14 @@ class Week extends React.Component {
         </div>
       );
     });
+
+    const formatTitle = (evnt) => {
+      const title = evnt.title || 'No title';
+
+      return evnt.allDay
+        ? title
+        : `${evnt.startDate.format('ha')} ${title}`;
+    };
 
     const renderEvents = (positioned || []).map((e, idx) => {
       const rows = e.map((b) => {
@@ -80,13 +88,19 @@ class Week extends React.Component {
           {'saving': evnt.saving}
         );
 
+        // eventually grab from the calendar category
+        // color
+        const eventBlockColors = !evnt.allDay && evnt.startDate.isSame(evnt.endDate, 'day')
+          ? { backgroundColor: 'transparent', color: '#af31fe' }
+          : { backgroundColor: '#af31fe', color: '#ffffff' };
+
         /* eslint-disable react/jsx-no-bind */
         return (
           <div styleName={`start-${start} span-${span}`} key={evnt.id}>
             <div styleName='event-block-wrapper' onMouseDown={(e) => !evnt.saving && this.edit(e, evnt)}>
-              <div styleName={eventBlockStyles}>
+              <div styleName={eventBlockStyles} style={eventBlockColors}>
                 <div styleName={eventStyles}>
-                  {evnt.title || 'No title'}
+                  {formatTitle(evnt)}
                 </div>
               </div>
             </div>

@@ -69,8 +69,8 @@ export default class MonthlyContainer extends React.Component {
             drag.stopDrag && (
             <NewModal
               onClose={dragActions.cancelDrag}
-              startDate={drag.startCell.isAfter(drag.lastCell) ? drag.lastCell : drag.startCell}
-              endDate={drag.startCell.isAfter(drag.lastCell) ? drag.startCell : drag.lastCell}
+              startDate={drag.startDate}
+              endDate={drag.endDate}
               newEvent={newEvent}
               newEventForm={newEventForm}
               formActions={formActions}
