@@ -34,13 +34,9 @@ const positionedEvent = (eventKey, events, weekStartDate, weekEndDate) => {
   };
 };
 
-// TODO improve / optimize / make not shit
-function collapse(data, showCount, startDate, endDate) {
-  const show = data.slice(0, showCount);
-  const rest = data.slice(showCount);
-
+function groupHiddenEventsByDay(hiddenRows, startDate, endDate) {
   const days = [];
-  const flattenedRest = flatten(rest);
+  const flattenedRest = flatten(hiddenRows);
   let idx = 1;
 
   for (let d = startDate; d <= endDate; d = d.clone().add(1, 'days')) {
@@ -62,12 +58,29 @@ function collapse(data, showCount, startDate, endDate) {
     idx = idx + 1;
   }
 
-  const stopRow = (data[showCount] || []).reduce((acc, val) => { acc[val.id] = val; return acc; }, {});
+  return days;
+}
 
-  const stopRowWithOverlaps = (data[showCount] || []).reduce((acc, val) => {
-    acc[val.id] = days.find((x) => x.id.length > 1 && x.id.includes(val.id)) !== undefined;
+function createStopRowLookup(data, showCount) {
+  return (data[showCount] || []).reduce((acc, val) => { acc[val.id] = val; return acc; }, {});
+}
+
+function createStopRowOverlapsLookup(data, showCount, hiddenDayEvents) {
+  return (data[showCount] || []).reduce((acc, val) => {
+    acc[val.id] = hiddenDayEvents.find((x) => x.id.length > 1 && x.id.includes(val.id)) !== undefined;
     return acc;
   }, {});
+}
+
+// TODO improve / optimize / make not shit
+function collapse(data, showCount, startDate, endDate) {
+  const visibleRows = data.slice(0, showCount);
+  const hiddenRows = data.slice(showCount);
+
+  const hiddenDayEvents = groupHiddenEventsByDay(hiddenRows, startDate, endDate);
+
+  const stopRowLookup = createStopRowLookup(data, showCount);
+  const stopRowOverlapLookup = createStopRowOverlapsLookup(data, showCount, hiddenDayEvents);
 
   // filter to select days that have an id of length 1 and
   //   that have a stop row with overlaps or a stop row with a position start
@@ -76,24 +89,29 @@ function collapse(data, showCount, startDate, endDate) {
   //   to the firt element in that id list if
   //   the position start is equal to the day it's on
   //   and it's a stop row without overlaps
-  const moreRow = days.filter((x) => {
-    if (x.id.length === 0) { return false; };
-    if (x.id.length !== 1) { return true; };
+  const moreRow = hiddenDayEvents.filter((hiddenDayEvent) => {
+    if (hiddenDayEvent.id.length === 0) { return false; };
+    if (hiddenDayEvent.id.length !== 1) { return true; };
 
-    const id = x.id[0];
-    const pos = stopRow[id];
-    return stopRowWithOverlaps[id] || pos && x.start === pos.start || !pos;
-  }).map((x) => {
-    if (x.id.length !== 1) { return x; };
+    const id = hiddenDayEvent.id[0];
+    const positionedEvent = stopRowLookup[id];
 
-    const pos = stopRow[x.id[0]];
+    return stopRowOverlapLookup[id] ||
+      !positionedEvent ||
+      positionedEvent.start === hiddenDayEvent.start;
+  }).map((hiddenDayEvent) => {
+    if (hiddenDayEvent.id.length !== 1) { return hiddenDayEvent; };
 
-    return pos && x.start === pos.start && !stopRowWithOverlaps[x.id[0]]
-      ? stopRow[x.id[0]]
-      : x;
+    const positionedEvent = stopRowLookup[hiddenDayEvent.id[0]];
+
+    return positionedEvent &&
+      hiddenDayEvent.start === positionedEvent.start &&
+      !stopRowOverlapLookup[hiddenDayEvent.id[0]]
+      ? stopRowLookup[hiddenDayEvent.id[0]]
+      : hiddenDayEvent;
   });
 
-  return moreRow.length > 0 ? show.concat([moreRow]) : show;
+  return moreRow.length > 0 ? visibleRows.concat([moreRow]) : visibleRows;
 }
 
 // returns an array of arrays of {eventId, position: { start, span, moreLeft,
