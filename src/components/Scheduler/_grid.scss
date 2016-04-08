@@ -1,0 +1,69 @@
+$columns: 7;
+$rows: 6;
+
+$cellHeight: 42px;
+$hours: 24;
+$fullHeight: $cellHeight * $hours + 20px;
+$hourMarkerWidth: 50px;
+$borderColor: #e6e6e6;
+$dottedBorderColor: #dedede;
+$todayBackgroundColor: rgba(240, 240, 240, 0.5);
+$borderSize: 1px;
+
+@mixin draggerWidth($span, $pad) {
+  width: (calc(100% * #{$span} / #{$columns} - #{$pad} - #{$borderSize}));
+}
+
+@mixin cellWidth($span, $colCount) {
+  width: (calc(100% * #{$span} / #{$colCount}));
+}
+
+@mixin cellHeight($span, $rowCount) {
+  height: (calc(100% * #{$span} / #{$rowCount}));
+}
+
+@mixin cellStart($pos, $colCount) {
+  left: (calc(100% * #{$pos - 1} / #{$colCount} + (#{$pos - 1}px * 1/7)));
+}
+
+@for $i from 1 through $columns {
+  .span-#{$i} {
+    position: absolute;
+    top: 0;
+    width: (calc(100% * #{$i} / #{$columns} - (#{$borderSize})));
+  }
+
+  .start-#{$i} {
+    @include cellStart($i, $columns);
+  }
+}
+
+@mixin hideVerticalScrollBars {
+  margin-right: -300px;
+  padding-right: 300px;
+}
+
+@mixin columnCells($columnBorderColor) {
+  .cell {
+    @include cellWidth(1, $columns);
+    border-right: $borderSize solid $columnBorderColor;
+    clear: none;
+    float: left;
+    height: 100%;
+    margin-bottom: 0;
+    margin-right: 0;
+    text-align: center;
+    @content;
+  }
+
+  // last column
+  .cell:nth-child(7n) {
+    margin-right: 0;
+    border-right: none;
+  }
+
+  // first column
+  .cell:nth-child(7n + 1) {
+    clear: left;
+  }
+}

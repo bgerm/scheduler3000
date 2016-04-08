@@ -1,28 +1,15 @@
-import Rx from 'rx';
+import { Observable } from 'rxjs';
 
-Rx.Observable.prototype.takeWhileInclusive = function (predicate, thisArg) {
+Observable.prototype.takeWhileInclusive = function(predicate) {
   const source = this;
-  const callback = Rx.internals.bindCallback(predicate, thisArg, 3);
 
-  return new Rx.AnonymousObservable(function (o) {
-    let i = 0;
-    let running = true;
+  return new Observable.create(function(o) {
+    return source.subscribe(function(val) {
+      o.next(val);
 
-    return source.subscribe(function (x) {
-      if (running) {
-        try {
-          running = callback(x, i++, source);
-        } catch (e) {
-          o.onError(e);
-          return;
-        }
-        if (running) {
-          o.onNext(x);
-        } else {
-          o.onNext(x);
-          o.onCompleted();
-        }
+      if (!predicate(val)) {
+        o.complete();
       }
-    }, function (e) { o.onError(e); }, function () { o.onCompleted(); });
-  }, source);
+    }, o.error.bind(o), o.complete.bind(o));
+  });
 };

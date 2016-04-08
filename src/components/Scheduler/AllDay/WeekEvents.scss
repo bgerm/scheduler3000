@@ -1,53 +1,48 @@
-@import 'month-grid';
+@import '../grid';
 
-.week {
+.events {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
   width: 100%;
-  @include cellHeight(1, $rows, $gutter);
-  margin-top: 1px;
-  margin-bottom: 1px;
-  margin-left: 1px;
-  overflow: hidden;
-  pointer-events: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  &.overflow {
+    overflow-y: scroll;
+  }
 }
+
 .event-row {
   width: 100%;
   position: relative;
-  height: 1.5em;
-  line-height: 1.3em;
-  pointer-events: none;
+  height: 18px;
+  line-height: 18px;
+  font-size: 12px;
 }
+
 .event-row:after {
   content: "";
   display: table;
   clear: both;
 }
+
 .event-row.event-days > div {
   font-size: 12px;
   color: #666;
   text-align: right;
   padding: 2px 4px 0 0;
 }
+
 .event-row.event-days .today {
   font-weight: 600;
 }
 
 .event-row .event-block-wrapper {
-  pointer-events: all;
-  padding: 0 1px;
-}
-.event-row .event-block-wrapper.more {
-  pointer-events: none;
-}
-.more a {
-  pointer-events: all;
+  padding: 0 2px;
 }
 
-:global(.disable-pointer-events) .event-row .event-block-wrapper {
-  pointer-events: none;
-}
-:global(.disable-pointer-events) .event-row .event-block-wrapper.more a {
-  pointer-events: none;
-}
 .event-row .event-block {
   background-color: black;
   color: white;
@@ -56,17 +51,21 @@
   border-radius: 8px;
   opacity: 1;
 }
+
 .event-row .more .event-block {
   background-color: transparent;
 }
+
 .event-row .event-block.more-left {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
 .event-row .event-block.more-right {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+
 .event-row .event {
   padding: 0px 6px;
   font-size: 12px;
@@ -75,6 +74,7 @@
 .event-row .event-block.disabled {
   opacity: 0.4;
 }
+
 .saving {
   background: repeating-linear-gradient(
     45deg,

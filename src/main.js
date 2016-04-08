@@ -8,6 +8,11 @@ import Root from './containers/Root';
 import configureStore from './redux/configureStore';
 import ReactModal2 from 'react-modal2';
 
+/*
+import Perf from 'react-addons-perf';
+window.Perf = Perf; // save for later console calls
+*/
+
 ReactModal2.getApplicationElement = () => document.getElementById('viewport');
 
 // Configure history for react-router

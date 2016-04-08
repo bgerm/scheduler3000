@@ -1,0 +1,41 @@
+@import '../grid';
+
+$borderColor: #eee;
+
+.grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  &.overflow {
+    overflow-y: scroll;
+  }
+
+  .cell {
+    float: left;
+    height: 100%;
+    width: calc(100% / 7);
+    border-right: 1px solid $borderColor;
+  }
+
+  .cell:last-child {
+    border-right: none;
+  }
+
+  .cell.today {
+    background: #e9f4f1;
+  }
+
+  .cell.selected-create {
+    background: #ece6d8;
+  }
+
+  .cell.selected-edit {
+    background: #E3E1DC;
+  }
+}

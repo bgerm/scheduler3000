@@ -97,7 +97,7 @@ const StyledHeaderContainer = CSSModules(HeaderContainer, styles, {allowMultiple
 function mapStateToProps(state) {
   return {
     period: state.scheduler.period,
-    isFetching: state.scheduler.events.fetching.length > 0,
+    isFetching: state.scheduler.events.get('fetching').size > 0,
     notification: state.scheduler.notification
   };
 }

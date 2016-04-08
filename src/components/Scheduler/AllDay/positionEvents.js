@@ -6,22 +6,25 @@ function overlaps(event1, event2) {
   if (!event1 || !event2) return false;
 
   return isRangeOverlapping(
-    event1.startDate,
-    event1.endDate,
-    event2.startDate,
-    event2.endDate
+    event1.get('startDate'),
+    event1.get('endDate'),
+    event2.get('startDate'),
+    event2.get('endDate')
   );
 }
 
-function firstRowWithoutOverlaps(event, rows) {
-  return findIndex(rows, (row) => !overlaps(last(row), event));
+function firstRowWithoutOverlaps(calendarEvent, rows) {
+  return findIndex(rows, (row) => !overlaps(last(row), calendarEvent));
 }
 
 const positionedEvent = (eventKey, events, weekStartDate, weekEndDate) => {
-  const evnt = events.events[eventKey];
+  const evnt = events.get(eventKey);
 
-  const adjStartDate = moment.max(evnt.startDate, weekStartDate);
-  const adjEndDate = moment.min(evnt.endDate, weekEndDate);
+  const eventStartDate = evnt.get('startDate');
+  const eventEndDate = evnt.get('endDate');
+
+  const adjStartDate = moment.max(eventStartDate, weekStartDate);
+  const adjEndDate = moment.min(eventEndDate, weekEndDate);
 
   return {
     id: eventKey,
@@ -29,8 +32,8 @@ const positionedEvent = (eventKey, events, weekStartDate, weekEndDate) => {
     start: adjStartDate.diff(weekStartDate, 'days') + 1,
     startDate: adjStartDate,
     endDate: adjEndDate,
-    moreLeft: evnt.startDate < weekStartDate,
-    moreRight: evnt.endDate > weekEndDate
+    moreLeft: eventStartDate < weekStartDate,
+    moreRight: eventEndDate > weekEndDate
   };
 };
 
@@ -39,18 +42,25 @@ function groupHiddenEventsByDay(hiddenRows, startDate, endDate) {
   const flattenedRest = flatten(hiddenRows);
   let idx = 1;
 
-  for (let d = startDate; d <= endDate; d = d.clone().add(1, 'days')) {
-    const end = d.clone().endOf('day');
+  for (let dayStart = startDate;
+       dayStart <= endDate;
+       dayStart = dayStart.clone().add(1, 'days')) {
+    const dayEnd = dayStart.clone().endOf('day');
     const overlapping = flattenedRest.filter((x) => {
-      return overlaps(x, {startDate: d, endDate: end});
+      return isRangeOverlapping(
+        x.startDate,
+        x.endDate,
+        dayStart,
+        dayEnd
+      );
     }).map((x) => x.id);
 
     days.push({
       id: overlapping,
       span: 1,
       start: idx,
-      startDate: d,
-      endDate: end,
+      startDate: dayStart,
+      endDate: dayEnd,
       moreLeft: false,
       moreRight: false
     });
@@ -67,7 +77,8 @@ function createStopRowLookup(data, showCount) {
 
 function createStopRowOverlapsLookup(data, showCount, hiddenDayEvents) {
   return (data[showCount] || []).reduce((acc, val) => {
-    acc[val.id] = hiddenDayEvents.find((x) => x.id.length > 1 && x.id.includes(val.id)) !== undefined;
+    acc[val.id] = hiddenDayEvents.find((x) =>
+      x.id.length > 1 && x.id.includes(val.id)) !== undefined;
     return acc;
   }, {});
 }
@@ -114,35 +125,40 @@ function collapse(data, showCount, startDate, endDate) {
   return moreRow.length > 0 ? visibleRows.concat([moreRow]) : visibleRows;
 }
 
-// returns an array of arrays of {eventId, position: { start, span, moreLeft,
-// moreRight}
-export default function positionEvents(weekEvents, events, startDate, endDate, showCount) {
-  if (!weekEvents) {
+// returns an array of arrays of
+// {eventId, position: { start, span, moreLeft, moreRight} }
+export default function positionEvents(weekEventKeys, events, startDate, endDate, showLimit) {
+  if (!weekEventKeys) {
     return [];
   }
 
-  const sortedEvents = orderBy(weekEvents,
-    [(x) => moment.max(events.events[x].startDate, startDate).valueOf(),
-     (x) => moment.min(events.events[x].endDate, endDate).valueOf()],
+  const sortedEvents = orderBy(weekEventKeys,
+    [(x) => moment.max(events.getIn([x, 'startDate']), startDate).valueOf(),
+     (x) => moment.min(events.getIn([x, 'endDate']), endDate).valueOf()],
     ['asc', 'desc']
   );
 
   const rows = [];
 
   sortedEvents.forEach((eventIdx, index) => {
-    const ev = events.events[eventIdx];
+    const ev = events.get(eventIdx);
 
     const firstIdx = firstRowWithoutOverlaps(ev, rows);
     if (firstIdx === -1) {
-      rows.push([ev]);
+      rows.push([ev]); // add a new row
     } else {
-      rows[firstIdx].push(ev);
+      rows[firstIdx].push(ev); // append at the found row
     }
   });
 
-  const result = rows.map((x) => x.map((y) => positionedEvent(y.id, events, startDate, endDate)));
-  if (showCount) {
-    return collapse(result, showCount, startDate, endDate);
+  // convert to new the positioned format
+  const result = rows.map((row) =>
+    row.map((evnt) => positionedEvent(evnt.get('id'), events, startDate, endDate))
+  );
+
+  // collapse if we have a show limit
+  if (showLimit >= 0) {
+    return collapse(result, showLimit, startDate, endDate);
   } else {
     return result;
   }

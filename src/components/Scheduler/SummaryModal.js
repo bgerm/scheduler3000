@@ -13,7 +13,7 @@ const propTypes = {
 export default class SummaryModal extends React.Component {
   render() {
     const { deleteEvent, onClose, events, eventId } = this.props;
-    const evnt = events[eventId];
+    const evnt = events.get(eventId);
 
     /* eslint-disable react/jsx-no-bind */
     return (
@@ -27,7 +27,7 @@ export default class SummaryModal extends React.Component {
         </div>
         <div>
           <div style={{marginTop: '10px'}}>
-            <h6>{evnt.title}</h6>
+            <h6>{evnt.get('title')}</h6>
             <p><EventTime event={evnt} /></p>
             <div className='clearfix'>
               <a style={{float: 'left'}}>Edit Event &raquo;</a>

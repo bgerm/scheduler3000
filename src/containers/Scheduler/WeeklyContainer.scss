@@ -1,0 +1,126 @@
+@import '../../components/Scheduler/grid';
+
+.weekly-container {
+  display: flex;
+  flex-grow: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.grid-container {
+  background-color: white;
+  height: $fullHeight;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  cursor: default;
+  user-select: none;
+  overflow: hidden;
+  padding-top: 10px;
+}
+
+
+.hour-markers {
+  float: left;
+  width: $hourMarkerWidth;
+  border-top: 1px solid transparent;
+}
+
+.grid {
+  height: $fullHeight;
+  display: table;
+  border-collapse: collapse;
+  width: calc(100% - #{$hourMarkerWidth});
+  float: right;
+  border-top: 1px solid #e6e6e6;
+}
+
+.full {
+  height: $cellHeight;
+  width: 100%;
+  // Center dotted line
+  background-image: radial-gradient(1px 1px at center,#dedede 0,transparent 1px);
+  background-size: 3px $cellHeight;
+  // End center dotted line
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.off-hour {
+  background-color: #FBFBFB;
+}
+
+.hour-marker {
+  border-bottom: 1px solid transparent;
+  color: #666;
+  font-size: 85%;
+  height: $cellHeight;
+  line-height: 0;
+  padding-right: 8px;
+  text-align: right;
+}
+
+.events-container {
+  background-color: transparent;
+  height: $fullHeight - 10px;
+  position: absolute;
+  top: 0;
+  width: calc(100% - #{$hourMarkerWidth});
+  cursor: default;
+  user-select: none;
+  margin-left: $hourMarkerWidth;
+  border-left: 1px solid $borderColor;
+  border-right: 1px solid $borderColor;
+
+  @include columnCells($borderColor) {
+    color: #666;
+    text-align: center;
+    background: transparent;
+  }
+
+  .cell.today {
+    background: $todayBackgroundColor;
+  }
+}
+
+.all-day {
+  background: white;
+  border-bottom: 4px solid #e6e6e6;
+
+  .all-day-container {
+    padding-left: 50px;
+    //@include hideVerticalScrollBars;
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+
+  .all-day-wrapper {
+    height: 80px;
+    border-left: 1px solid $borderColor;
+    border-right: 1px solid $borderColor;
+    border-top: 1px solid $borderColor;
+  }
+
+  .all-day-grid {
+    border-top: 1px solid $borderColor;
+    margin-left: $hourMarkerWidth;
+    overflow: hidden;
+
+    @include columnCells($borderColor) {
+      height: auto;
+    }
+
+    .cell.today {
+      background: $todayBackgroundColor;
+    }
+  }
+}
+
+.now-marker {
+  height: 1px;
+  background: red;
+  width: calc(100% - #{$hourMarkerWidth});
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  margin-left: $hourMarkerWidth;
+}

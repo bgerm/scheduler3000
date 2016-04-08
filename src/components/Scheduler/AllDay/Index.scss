@@ -1,0 +1,39 @@
+@import '../grid';
+
+.weeks {
+  background: white;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+.dragger, .dragger-sizer {
+  padding: 0 6px;
+  background: #3879D9;
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  height: 1.5em;
+  line-height: 1.5em;
+  font-size: 12px;
+  color: white;
+  @include draggerWidth(1, 6px);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dragger-sizer {
+  visibility: hidden;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wide {
+  @include draggerWidth(1.25, 0px);
+}
+
+.hidden {
+  display: none;
+}

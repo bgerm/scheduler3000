@@ -1,0 +1,47 @@
+@import '../grid';
+
+$borderColor: #eee;
+.week {
+  display: block;
+  //height: 80px;
+  background-color: white;
+  border-bottom: 1px solid $borderColor;
+}
+
+.grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow-y: scroll;
+  width: 100%;
+
+  .cell {
+    float: left;
+    height: 100%;
+    width: calc(100% / 7);
+    border-right: 1px solid $borderColor;
+  }
+
+  .cell:last-child {
+    border-right: none;
+  }
+}
+
+.events {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.bar {
+  position: absolute;
+  background: red;
+  width: 100px;
+  height: 20px;
+  top: 0;
+  left: calc(100% * 2/7);
+}

@@ -6,6 +6,7 @@ import momentPropType from 'utils/PropTypes/momentPropType';
 import { Field, getField } from 'react-redux-form';
 import classNames from 'classNames';
 import uuid from 'node-uuid';
+import Immutable from 'immutable';
 
 const isRequired = (value) => value !== null && value.length !== 0;
 
@@ -65,7 +66,7 @@ export default class NewModal extends React.Component {
           <div className='form-group row'>
             <label className='col-sm-2 form-control-label'>When</label>
             <div className='col-sm-10' style={{padding: '.375rem 1rem'}}>
-              <EventTime event={{startDate, endDate, allDay: true}} /> (<a>Change</a>)
+              <EventTime event={Immutable.fromJS({startDate, endDate, allDay: true})} /> (<a>Change</a>)
             </div>
           </div>
           <div className={titleRowClasses}>

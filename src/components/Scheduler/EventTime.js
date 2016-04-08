@@ -12,7 +12,11 @@ const propTypes = {
 
 export default class EventTime extends React.Component {
   formatEventTime() {
-    const { startDate, endDate, allDay } = this.props.event;
+    const calendarEvent = this.props.event;
+
+    const startDate = calendarEvent.get('startDate');
+    const endDate = calendarEvent.get('endDate');
+    const allDay = calendarEvent.get('allDay');
 
     if (allDay) {
       if (startDate.isSame(endDate, 'day')) {

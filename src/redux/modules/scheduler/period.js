@@ -76,7 +76,7 @@ function findPreviousPeriod(period, date) {
 const timezone = 'America/New_York';
 const today = moment.tz(timezone);
 
-const initialSelectedDate = today.clone().startOf('month');
+const initialSelectedDate = today;
 const initialPeriodType = PERIOD_TYPES.monthly;
 const initalBounds = periodBounds(initialPeriodType, initialSelectedDate);
 

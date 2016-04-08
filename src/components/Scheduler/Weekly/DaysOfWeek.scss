@@ -1,0 +1,19 @@
+@import '../grid';
+
+.days-of-week {
+  @include hideVerticalScrollBars;
+  background: white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding-left: $hourMarkerWidth;
+
+  @include columnCells(transparent) {
+    height: 30px;
+    text-align: center;
+    color: #666;
+  }
+
+  .cell.today {
+    font-weight: bold;
+  }
+}

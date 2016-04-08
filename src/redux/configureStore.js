@@ -1,7 +1,7 @@
 import thunk from 'redux-thunk';
 import rootReducer from './rootReducer';
 import schedulerSaga from 'sagas/scheduler';
-import { Subject } from 'rx';
+import { Subject } from 'rxjs';
 import { routerMiddleware } from 'react-router-redux';
 import {
   applyMiddleware,
@@ -17,7 +17,7 @@ const sagaMiddleware = (saga) => {
 
     return (next) => (action) => {
       next(action);
-      subject.onNext({action: action, store: store.getState()});
+      subject.next({action: action, store: store.getState()});
     };
   };
 };
