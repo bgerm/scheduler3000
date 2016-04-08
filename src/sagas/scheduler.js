@@ -32,7 +32,8 @@ const fetchData = (iterable) => {
     .filter(actionPredicate(Object.values(PeriodActions.actionTypes)))
     .map(({action, store}) => store.scheduler.period)
     .distinctUntilChanged()
-    .debounceTime(250);
+    .debounceTime(250)
+    .share();
 
   const fetchStream = dataChangedStream.flatMap((period) => {
     const startDate = period.get('startDate');
@@ -52,14 +53,14 @@ const fetchData = (iterable) => {
           return EventsActions.loadEventsFailure(error);
         }
       });
-  });
+  }).share();
 
   const isLoadingStream = dataChangedStream
-    .map((x) => true)
-    .merge(fetchStream.map((x) => false))
+    .map(() => true)
+    .merge(fetchStream.map(() => false))
     .distinctUntilChanged()
     .filter((x) => x)
-    .map((x) => EventsActions.pushFetching());
+    .map(() => EventsActions.pushFetching());
 
   return fetchStream.merge(isLoadingStream);
 };
