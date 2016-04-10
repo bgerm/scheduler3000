@@ -10,5 +10,9 @@ export default (config) => ({
       host: 'http://localhost:8000',
       match: /^\/api\/.*/
     }
+  },
+  globals: {
+    ...config.globals,
+    __API_ROOT__: JSON.stringify('http://localhost:3000/api')
   }
 });

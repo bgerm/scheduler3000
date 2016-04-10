@@ -1,8 +1,6 @@
 import React, { PropTypes } from 'react';
 import styles from './WeeklyContainer.scss';
 import CSSModules from 'react-css-modules';
-import { range } from 'lodash';
-import classNames from 'classNames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as EventsActions from 'redux/modules/scheduler/events';

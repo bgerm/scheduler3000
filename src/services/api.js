@@ -4,9 +4,6 @@ import fetch from 'isomorphic-fetch';
 import moment from 'moment-timezone';
 import { deepMapValues } from 'lodash-deep';
 
-// TODO read from config (tried earlier, but got very weird error)
-const API_ROOT = 'http://localhost:3000/api';
-
 function appendParamsToUrl(url, params) {
   if (params !== null && typeof params === 'object') {
     const qs = Object.keys(params)
@@ -22,14 +19,18 @@ function appendParamsToUrl(url, params) {
   return url;
 }
 
+function apiEndpoint(endpoint, params) {
+  const url = (endpoint.indexOf(__API_ROOT__) === -1)
+    ? __API_ROOT__ + endpoint
+    : endpoint;
+
+  return appendParamsToUrl(url, params);
+}
+
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
 function callApi(endpoint, config, params = null, schema, transformations) {
-  const url = (endpoint.indexOf(API_ROOT) === -1)
-    ? API_ROOT + endpoint
-    : endpoint;
-
-  const fullUrl = appendParamsToUrl(url, params);
+  const fullUrl = apiEndpoint(endpoint, params);
 
   return fetch(fullUrl, config || {})
     .then((response) =>
