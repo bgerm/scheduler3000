@@ -11,6 +11,7 @@ import DaysOfWeek from 'components/Scheduler/Weekly/DaysOfWeek';
 import { actions as FormActions } from 'react-redux-form';
 import * as AllDayLayoutActions from 'redux/modules/scheduler/allDayLayout';
 import AllDay from 'components/Scheduler/AllDay';
+import Timed from 'components/Scheduler/Timed';
 import themes from 'components/Scheduler/themes';
 import NewModal from 'components/Scheduler/NewModal';
 import SummaryModal from 'components/Scheduler/SummaryModal';
@@ -40,41 +41,6 @@ export default class WeeklyContainer extends React.Component {
 
     const { dragActions, allDayLayoutActions, formActions, eventsActions } = actions;
 
-    const hours = range(0, 24).map((hour) => {
-      const styleNames = classNames(
-        'full',
-        {'off-hour': hour < 9 || hour > 18}
-      );
-
-      return (
-        <div key={hour} styleName={styleNames}>
-        </div>
-      );
-    });
-
-    const hourMarkers = range(0, 24).map((hour) => {
-      const amPm = hour >= 11 ? 'PM' : 'AM';
-      const showHour = ((hour + 11) % 12) + 1;
-
-      return (
-        <div key={`marker-${hour}`} styleName='hour-marker'>
-          {showHour} {amPm}
-        </div>
-      );
-    });
-
-    const eventColumns = range(0, 7).map((day) => {
-      const styleNames = classNames(
-        'cell',
-        {'today': day === 1}
-      );
-
-      return (
-        <div key={`day-column-${day}`} styleName={styleNames}>
-        </div>
-      );
-    });
-
     return (
       <div className='vflex' style={{height: '100%', overflow: 'hidden'}}>
         <DaysOfWeek period={period} />
@@ -99,18 +65,11 @@ export default class WeeklyContainer extends React.Component {
           </div>
         </div>
         <div styleName='weekly-container'>
-          <div styleName='grid-container' className='clearfix'>
-            <div styleName='hour-markers'>
-              {hourMarkers}
-            </div>
-            <div styleName='grid'>
-              {hours}
-            </div>
-          </div>
-          <div styleName='events-container'>
-            {eventColumns}
-          </div>
-          <div styleName='now-marker' style={{top: '300px'}}></div>
+          <Timed
+            period={period}
+            events={events}
+            theme={theme}
+          />
         </div>
         {drag.dragType === DRAG_TYPES.create &&
           drag.stopDrag && (

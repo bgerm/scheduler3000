@@ -1,0 +1,19 @@
+@import '../grid';
+
+.hour-marker {
+  border-bottom: 1px solid transparent;
+  color: #666;
+  font-size: 85%;
+  height: $cellHeight;
+  line-height: 0;
+  padding-right: 8px;
+  text-align: right;
+}
+
+.hour-markers {
+  float: left;
+  width: $hourMarkerWidth;
+  border-top: 1px solid transparent;
+  margin-top: 10px;
+}
+

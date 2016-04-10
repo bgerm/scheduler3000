@@ -130,8 +130,10 @@ class AllDay extends React.Component {
       </div>
     );
 
+    // Absolute position weeks b/c sometimes things load
+    // in the wrong order and element-resize-events screws up
     return (
-      <div styleName='weeks' ref='weeks'>
+      <div styleName='weeks' ref='weeks' style={{position: 'absolute'}}>
         {weeks}
         {handle}
       </div>

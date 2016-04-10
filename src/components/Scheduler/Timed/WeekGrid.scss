@@ -1,0 +1,63 @@
+@import '../grid';
+
+.week-grid {
+  background-color: white;
+  height: $fullHeight;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  cursor: default;
+  user-select: none;
+  overflow: hidden;
+}
+
+.grid-container {
+  border-left: 1px solid $borderColor;
+  left: $hourMarkerWidth;
+  position: absolute;
+  top: 0;
+  width: calc(100% - #{$hourMarkerWidth});
+}
+
+.header-grid {
+  height: 10px;
+}
+
+.hours-grid {
+  top: 10px;
+  border-top: 1px solid $borderColor;
+}
+
+.hour-grid {
+  height: $cellHeight;
+  width: 100%;
+  border-bottom: 1px solid $borderColor;
+}
+
+.half-hour-marker {
+  border-top: 1px dotted $borderColor;
+  height: 1px;
+  margin-left: 1px; /* otherwise it interesects vertical lines at the wrong spot */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+// styles for .cell
+@include columnCells($borderColor) {
+  color: #666;
+  text-align: center;
+  background: transparent;
+}
+
+.today {
+  background-color: #E9F4F1;
+}
+
+.off-hour {
+  background-color: #FAFAFA;
+}
+
+.off-hour .today {
+  background-color: darken(#E9F4F1, 1.5%);
+}
+

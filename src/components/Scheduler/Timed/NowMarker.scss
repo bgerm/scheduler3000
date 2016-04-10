@@ -1,0 +1,11 @@
+@import '../grid';
+
+.now-marker {
+  height: 1px;
+  background: red;
+  width: calc(100% - #{$hourMarkerWidth});
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  margin-left: $hourMarkerWidth;
+}

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 Observable.prototype.takeWhileInclusive = function(predicate) {
   const source = this;
 
-  return new Observable.create(function(o) {
+  return Observable.create(function(o) {
     return source.subscribe(function(val) {
       o.next(val);
 
